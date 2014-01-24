@@ -24,7 +24,7 @@ augroup vimrc
     autocmd FocusLost * :silent! wall
 
     " Fold method is fold marker for any filetype
-    autocmd Filetype * setlocal fdm=marker
+    autocmd Filetype vim,python setlocal fdm=marker
 
     " Prevent auto comment prefixing
     autocmd FileType * setlocal formatoptions-=r formatoptions-=o
@@ -117,6 +117,7 @@ xnoremap il :<c-u>call <SID>NextTextObject('i', 'F')<cr>
 " In insert mode {{{2
 inoremap <C-E> <ESC>A
 inoremap <C-A> <ESC>I
+inoremap <C-K> <C-o>C
 " inoremap <C-b> <C-o>h
 " inoremap <C-f> <C-o>a
 " inoremap <C-n> <C-o>j
@@ -160,7 +161,6 @@ nnoremap <C-right> 5<C-W>>
 
 " Tabs {{{2
 nnoremap <C-w>t :tabedit %<CR>
-nnoremap <C-w>T :tabedit<SPACE> 
 
 " Faster  {{{2
 nnoremap Y y$
@@ -188,6 +188,7 @@ set expandtab
 set showcmd
 set noswapfile
 set undofile
+set guicursor+=n-v-c:blinkon0
 set history=100
 
 if strftime("%H") < 17
@@ -439,6 +440,7 @@ nnoremap ,A :Ag<SPACE>
 " vim-scripts/Workspace-manager {{{2
 nnoremap ;w :WsToggle<CR>
 let Ws_Enable_Fold_Column = 0
+let Ws_WinWidth = 35
 
 
 " ervandew/supertab {{{2
@@ -446,11 +448,11 @@ let g:SuperTabDefaultCompletionType = "<C-N>"
 
 
 " justinmk/vim-sneak {{{2
-let g:sneak#streak = 1
-nnoremap f :Sneak!         1<cr>
-nnoremap F :SneakBackward! 1<cr>
-xnoremap f :<c-u>SneakV!         1<cr>
-xnoremap F :<c-u>SneakVBackward! 1<cr>
+nmap m <Plug>SneakForward
+nmap M <Plug>SneakBackward
+nmap ! <Plug>SneakStreak
+hi SneakStreakTarget guifg=red guibg=bg gui=bold ctermfg=black ctermbg=red
+hi SneakStreakMask  guifg=#1A1A1A guibg=bg gui=bold ctermfg=black ctermbg=yellow
 
 
 " gregsexton/gitv {{{2
@@ -461,3 +463,7 @@ nnoremap gV :Gitv!<CR>
 " tpope/vim-vinegar {{{2
 nmap v- <Plug>VinegarSplitUp
 
+
+" plasticboy/vim-markdown {{{2
+let g:vim_markdown_folding_disabled=0
+let g:vim_markdown_initial_foldlevel=0
