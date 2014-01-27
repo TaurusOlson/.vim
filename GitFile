@@ -1,11 +1,8 @@
-vim-scripts/Notes
 rking/ag.vim
 kien/ctrlp.vim
 TaurusOlson/darkburn.vim
-vim-scripts/genutils
 TaurusOlson/graffik.vim
 TaurusOlson/molokai
-vim-scripts/opsplorer
 oinksoft/proj.vim
 ervandew/supertab
 majutsushi/tagbar
@@ -25,4 +22,8 @@ jiangmiao/auto-pairs
 vimwiki/vimwiki
 gregsexton/gitv
 justinmk/vim-sneak
-tommcdo/vim-lion
+godlygeek/tabular
+vim-scripts/Workspace-Manager
+vim-scripts/opsplorer
+vim-scripts/genutils
+vim-scripts/Notes
