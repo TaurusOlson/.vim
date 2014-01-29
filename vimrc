@@ -193,11 +193,11 @@ set history=100
 
 if strftime("%H") < 17
     set background=light
-    colorscheme solarized
 else
     set background=dark
-    colorscheme graffik
 endif
+
+colorscheme solarized
 
 
 " Directories {{{2
