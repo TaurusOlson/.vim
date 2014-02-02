@@ -188,7 +188,8 @@ set undofile
 set guicursor+=n-v-c:blinkon0
 set history=100
 
-if 8 <= strftime("%H") <= 17
+" Adapt the background to the current time
+if strftime("%H") > 8 && strftime("%H") < 17
     set background=light
 else
     set background=dark
