@@ -188,7 +188,7 @@ set undofile
 set guicursor+=n-v-c:blinkon0
 set history=100
 
-if strftime("%H") < 17
+if 8 <= strftime("%H") <= 17
     set background=light
 else
     set background=dark
@@ -214,7 +214,6 @@ if has('gui_running')
     set guioptions=g
     set guifont=Cousine:h14
     set linespace=5
-    se background=dark
     colorscheme base16-default
 endif
 
@@ -353,7 +352,6 @@ call plug#begin('~/.vim/bundle')
 
 Plug 'mbbill/VimExplorer'
 Plug 'jiangmiao/auto-pairs'
-Plug 'chriskempson/base16-vim'
 Plug 'TaurusOlson/darkburn.vim'
 Plug 'vim-scripts/genutils'
 Plug 'oinksoft/proj.vim'
