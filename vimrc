@@ -2,9 +2,6 @@
 
 set nocompatible 
 
-" Pathogen {{{1
-execute pathogen#infect()
-
 syntax on
 filetype plugin indent on
 
@@ -12,7 +9,7 @@ filetype plugin indent on
 " Autocmds {{{1
 
 augroup vimrc
-   autocmd!
+    autocmd!
 
     " cd into the current directory
     autocmd BufEnter * if strpart(expand("%:h"), 0, 8) !=# 'fugitive' | silent cd %:p:h
@@ -140,6 +137,7 @@ nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 " Folds {{{2
 nnoremap <SPACE> za
 
+
 " Windows {{{2
 " Jump to a window
 nnoremap <C-h> <C-w>h
@@ -177,7 +175,6 @@ set statusline +=%=%-14.(%l,%c%V%)\ %P
 
 
 " Options {{{1
-" set formatoptions+=j
 set hlsearch
 set vb t_vb=
 set splitright
@@ -191,13 +188,16 @@ set undofile
 set guicursor+=n-v-c:blinkon0
 set history=100
 
-if strftime("%H") < 17
+" Adapt the background to the current time
+if strftime("%H") > 8 && strftime("%H") < 17
     set background=light
-    colorscheme solarized
 else
     set background=dark
-    colorscheme graffik
 endif
+
+
+" Folds
+set nofoldenable
 
 
 " Directories {{{2
@@ -215,6 +215,7 @@ if has('gui_running')
     set guioptions=g
     set guifont=Cousine:h14
     set linespace=5
+    colorscheme base16-default
 endif
 
 
@@ -348,7 +349,24 @@ command! -bar -nargs=0 ToggleFocus :call Focus()
 
 " Plugins {{{1
 
+call plug#begin('~/.vim/bundle')
+
+Plug 'mbbill/VimExplorer'
+Plug 'jiangmiao/auto-pairs'
+Plug 'TaurusOlson/darkburn.vim'
+Plug 'vim-scripts/genutils'
+Plug 'oinksoft/proj.vim'
+Plug 'SirVer/ultisnips'
+Plug 'reedes/vim-colors-pencil'
+Plug 'altercation/vim-colors-solarized'
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-sensible'
+
+
 " kien/ctrlp.vim {{{2
+Plug 'kien/ctrlp.vim'
 let g:ctrlp_buftag_ctags_bin = '/usr/local/bin/ctags'
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
@@ -363,6 +381,7 @@ nnoremap <LocalLeader>a :CtrlPBookmarkDirAdd .<CR>
 
 
 " tpope/vim-fugitive {{{2
+Plug 'tpope/vim-fugitive'
 nnoremap gs :Gstatus<CR>
 nnoremap ga :Git add %<CR>
 nnoremap gw :Gwrite<CR>
@@ -374,7 +393,8 @@ autocmd BufReadPost fugitive://* set bufhidden=delete
 autocmd FileType gitcommit setlocal cursorline
 
 
-" SirVer/Ultisnips {{{2
+" SirVer/ultisnips {{{2
+Plug 'SirVer/ultisnips'
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
@@ -383,6 +403,7 @@ nnoremap \s :split ~/.vim/bundle/ultisnips/UltiSnips<CR>
 
 
 " vimwiki/vimwiki {{{2
+Plug 'vimwiki/vimwiki'
 let g:vimwiki_fold_lists = 1
 let mywiki = {}
 let mywiki.path = '~/Dropbox/Blogs/vimwiki/'
@@ -397,7 +418,8 @@ let g:vimwiki_ext2syntax = {'.wiki': 'media'}
 let g:vimwiki_hl_headers = 1
 
 
-" Notes {{{2
+" vim-scripts/Notes {{{2
+Plug 'vim-scripts/Notes'
 let g:notesRoot='~/Dropbox/Blogs/vimwiki/'
 let g:notesFileType = 'vimwiki'
 let g:notesFileExtension = '.wiki'
@@ -405,19 +427,23 @@ let g:notesWordSeparator = '_'
 
 
 " majutsushi/tagbar {{{2
+Plug 'majutsushi/tagbar'
 nnoremap ;t :TagbarToggle<CR>
 
 
 " szw/vim-ctrlspace {{{2
+Plug 'szw/vim-ctrlspace'
 let g:ctrlspace_default_mapping_key = "<Leader><Space>"
 
 
-" Opsplorer {{{2
+" vim-scripts/opsplorer {{{2
+Plug 'vim-scripts/opsplorer'
 nnoremap ;v :call ToggleShowOpsplorer()<CR>
 autocmd BufEnter __Opsplorer__ set bufhidden=delete
 
 
 " Processing {{{2
+Plug 'goonzoid/vim-reprocessed'
 autocmd BufRead,BufEnter *.pde nnoremap <buffer> ;s :split $PROJECTS/Processing/snippets<CR>
 
 " Run procesing from the command line
@@ -433,37 +459,38 @@ command! -nargs=0 RunProcessing :call RunProcessing()
 
 
 " rking/ag.vim {{{2
+Plug 'rking/ag.vim'
 nnoremap ,a :Ag<SPACE><c-r>=expand("<cword>")<CR>
 nnoremap ,A :Ag<SPACE>
 
 
-" vim-scripts/Workspace-manager {{{2
-nnoremap ;w :WsToggle<CR>
-let Ws_Enable_Fold_Column = 0
-let Ws_WinWidth = 35
+" " vim-scripts/Workspace-manager {{{2
+" Plug 'vim-scripts/Workspace-manager'
+" nnoremap ;w :WsToggle<CR>
+" let Ws_Enable_Fold_Column = 0
+" let Ws_WinWidth = 35
 
 
 " ervandew/supertab {{{2
+Plug 'ervandew/supertab'
 let g:SuperTabDefaultCompletionType = "<C-N>"
 
 
-" justinmk/vim-sneak {{{2
-nmap m <Plug>SneakForward
-nmap M <Plug>SneakBackward
-nmap ! <Plug>SneakStreak
-hi SneakStreakTarget guifg=red guibg=bg gui=bold ctermfg=black ctermbg=red
-hi SneakStreakMask  guifg=#1A1A1A guibg=bg gui=bold ctermfg=black ctermbg=yellow
-
-
 " gregsexton/gitv {{{2
+Plug 'gregsexton/gitv'
 nnoremap gv :Gitv<CR>
 nnoremap gV :Gitv!<CR>
 
 
-" tpope/vim-vinegar {{{2
-nmap v- <Plug>VinegarSplitUp
-
-
 " plasticboy/vim-markdown {{{2
+Plug 'plasticboy/vim-markdown'
 let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_initial_foldlevel=0
+
+
+" sjl/gundo.vim {{{2
+Plug 'sjl/gundo.vim'
+nnoremap ;g :GundoToggle<CR>
+
+
+call plug#end()
