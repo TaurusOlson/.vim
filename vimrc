@@ -138,7 +138,7 @@ nnoremap <silent> <Leader>T :let word=expand("<cword>")<CR>:vsp<CR>:wincmd w<cr>
 " Open a Quickfix window for the last search.
 nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 
-" Folds 
+" Folds {{{2
 nnoremap <SPACE> za
 nnoremap g1 :let @a=printf(&cms, ' {{{1')<CR>A<SPACE><ESC>"ap
 nnoremap g2 :let @a=printf(&cms, ' {{{2')<CR>A<SPACE><ESC>"ap
@@ -404,8 +404,9 @@ Plug 'SirVer/ultisnips'
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-let g:UltiSnipsSnippetDirectories=['bundle/ultisnips/UltiSnips']
-nnoremap \s :split ~/.vim/bundle/ultisnips/UltiSnips<CR>
+let g:UltiSnipsSnippetDir='~/.vim/snippets'
+let g:UltiSnipsSnippetDirectories=['snippets']
+nnoremap <LocalLeader>s :split ~/.vim/snippets<CR>
 
 
 " vimwiki/vimwiki {{{2
