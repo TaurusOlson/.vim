@@ -136,6 +136,9 @@ nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 
 " Folds {{{2
 nnoremap <SPACE> za
+nnoremap g1 A<SPACE>{{{1
+nnoremap g2 A<SPACE>{{{2
+nnoremap g3 A<SPACE>{{{3
 
 
 " Windows {{{2
@@ -434,6 +437,22 @@ nnoremap ;t :TagbarToggle<CR>
 " szw/vim-ctrlspace {{{2
 Plug 'szw/vim-ctrlspace'
 let g:ctrlspace_default_mapping_key = "<Leader><Space>"
+hi def CtrlSpaceNormal guifg=fg guibg=bg
+hi def CtrlSpaceSelected guifg=bg guifg=bg gui=underline
+hi def CtrlSpaceFound guifg=red guibg=NONE gui=underline
+let g:ctrlspace_symbols = {
+            \ "cs"      : "CS",
+            \ "tab"     : "TAB",
+            \ "all"     : "ALL",
+            \ "add"     : "ADD",
+            \ "load"    : "LOAD",
+            \ "save"    : "SAVE",
+            \ "ord"     : "123",
+            \ "abc"     : "ABC",
+            \ "prv"     : "*",
+            \ "s_left"  : "[",
+            \ "s_right" : "]"
+            \ }
 
 
 " vim-scripts/opsplorer {{{2
@@ -491,6 +510,26 @@ let g:vim_markdown_initial_foldlevel=0
 " sjl/gundo.vim {{{2
 Plug 'sjl/gundo.vim'
 nnoremap ;g :GundoToggle<CR>
+
+
+" tpope/vim-fireplace {{{2
+Plug 'tpope/vim-fireplace'
+
+
+" tpope/vim-classpath {{{2
+Plug 'tpope/vim-classpath'
+
+
+" tpope/vim-sexp-mappings-for-regular-people {{{2
+Plug 'tpope/vim-sexp-mappings-for-regular-people'
+
+
+" guns/vim-clojure-static {{{2
+Plug 'guns/vim-clojure-static'
+
+
+" guns/vim-sexp {{{2
+Plug 'guns/vim-sexp'
 
 
 call plug#end()
