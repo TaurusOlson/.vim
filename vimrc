@@ -8,7 +8,7 @@ filetype plugin indent on
 
 " Autocmds {{{1
 
-augroup vimrc
+augroup vimrc_group
     autocmd!
 
     " cd into the current directory
@@ -21,7 +21,7 @@ augroup vimrc
     autocmd FocusLost * :silent! wall
 
     " Fold method is fold marker for any filetype
-    autocmd Filetype vim,python setlocal fdm=marker
+    autocmd Filetype * setlocal fdm=marker
 
     " Prevent auto comment prefixing
     autocmd FileType * setlocal formatoptions-=r formatoptions-=o
@@ -48,6 +48,10 @@ augroup vimrc
     " Sort properties alphabetically
     au FileType css nnoremap <buffer> <LocalLeader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
 
+    au FileType rst setlocal suffixesadd=.rst
+
+    " Quickfix
+    au FileType qf setlocal cursorline
 augroup END
 
 
@@ -136,9 +140,9 @@ nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 
 " Folds {{{2
 nnoremap <SPACE> za
-nnoremap g1 A<SPACE>{{{1
-nnoremap g2 A<SPACE>{{{2
-nnoremap g3 A<SPACE>{{{3
+nnoremap g1 A<SPACE>{{{1<ESC>
+nnoremap g2 A<SPACE>{{{2<ESC>
+nnoremap g3 A<SPACE>{{{3<ESC>
 
 
 " Windows {{{2
@@ -359,7 +363,6 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'TaurusOlson/darkburn.vim'
 Plug 'vim-scripts/genutils'
 Plug 'oinksoft/proj.vim'
-Plug 'SirVer/ultisnips'
 Plug 'reedes/vim-colors-pencil'
 Plug 'altercation/vim-colors-solarized'
 Plug 'tpope/vim-surround'
@@ -510,6 +513,10 @@ let g:vim_markdown_initial_foldlevel=0
 " sjl/gundo.vim {{{2
 Plug 'sjl/gundo.vim'
 nnoremap ;g :GundoToggle<CR>
+
+
+" godlygeek/tabular {{{2
+Plug 'godlygeek/tabular'
 
 
 " tpope/vim-fireplace {{{2
