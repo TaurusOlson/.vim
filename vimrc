@@ -21,7 +21,7 @@ augroup vimrc_group
     autocmd FocusLost * :silent! wall
 
     " Fold method is fold marker for any filetype
-    autocmd Filetype * setlocal fdm=marker
+    autocmd Filetype vim,python setlocal fdm=marker
 
     " Prevent auto comment prefixing
     autocmd FileType * setlocal formatoptions-=r formatoptions-=o
@@ -52,6 +52,12 @@ augroup vimrc_group
 
     " Quickfix
     au FileType qf setlocal cursorline
+
+    " Clojure
+    " Eval current line and jump to next element (use vim-sexp)
+    au FileType clojure nmap <buffer> <CR> :Eval<CR><Plug>(sexp_move_to_next_element_head)
+    " Eval current line
+    au FileType clojure nnoremap <buffer> <S-CR> :Eval<CR>
 augroup END
 
 
@@ -223,6 +229,8 @@ if has('gui_running')
     set guifont=Cousine:h14
     set linespace=5
     colorscheme base16-default
+else
+    set t_Co=256
 endif
 
 
@@ -399,14 +407,14 @@ autocmd BufReadPost fugitive://* set bufhidden=delete
 autocmd FileType gitcommit setlocal cursorline
 
 
-" SirVer/ultisnips {{{2
-Plug 'SirVer/ultisnips'
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<tab>"
-let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-let g:UltiSnipsSnippetDir='~/.vim/snippets'
-let g:UltiSnipsSnippetDirectories=['snippets']
-nnoremap <LocalLeader>s :split ~/.vim/snippets<CR>
+" " SirVer/ultisnips {{{2
+" Plug 'SirVer/ultisnips'
+" let g:UltiSnipsExpandTrigger="<tab>"
+" let g:UltiSnipsJumpForwardTrigger="<tab>"
+" let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+" let g:UltiSnipsSnippetDir='~/.vim/snippets'
+" let g:UltiSnipsSnippetDirectories=['snippets']
+" nnoremap <LocalLeader>s :split ~/.vim/snippets<CR>
 
 
 " vimwiki/vimwiki {{{2
@@ -441,9 +449,9 @@ nnoremap ;t :TagbarToggle<CR>
 " szw/vim-ctrlspace {{{2
 Plug 'szw/vim-ctrlspace'
 let g:ctrlspace_default_mapping_key = "<Leader><Space>"
-hi def CtrlSpaceNormal guifg=fg guibg=bg
-hi def CtrlSpaceSelected guifg=bg guifg=bg gui=underline
-hi def CtrlSpaceFound guifg=red guibg=NONE gui=underline
+hi CtrlSpaceNormal guifg=fg guibg=bg
+hi CtrlSpaceSelected guifg=red guifg=bg gui=underline
+hi CtrlSpaceFound guifg=red guibg=NONE gui=underline
 let g:ctrlspace_symbols = {
             \ "cs"      : "CS",
             \ "tab"     : "TAB",
@@ -487,11 +495,11 @@ nnoremap <Leader>a :Ag<SPACE><c-r>=expand("<cword>")<CR>
 nnoremap <Leader>A :Ag<SPACE>
 
 
-" " vim-scripts/Workspace-manager {{{2
-" Plug 'vim-scripts/Workspace-manager'
-" nnoremap ;w :WsToggle<CR>
-" let Ws_Enable_Fold_Column = 0
-" let Ws_WinWidth = 35
+" vim-scripts/Workspace-manager {{{2
+Plug 'https://github.com/vim-scripts/Workspace-Manager.git'
+nnoremap ;w :WsToggle<CR>
+let Ws_Enable_Fold_Column = 0
+let Ws_WinWidth = 35
 
 
 " ervandew/supertab {{{2
@@ -539,5 +547,8 @@ Plug 'guns/vim-clojure-static'
 " guns/vim-sexp {{{2
 Plug 'guns/vim-sexp'
 
+
+" wellle/targets.vim {{{2
+Plug 'wellle/targets.vim'
 
 call plug#end()
