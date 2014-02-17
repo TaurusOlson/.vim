@@ -151,9 +151,6 @@ nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 
 " Folds {{{2
 nnoremap <SPACE> za 
-" nnoremap g1 :let @a=printf(&cms, ' {{{1')<CR>A<SPACE><ESC>"ap
-" nnoremap g2 :let @a=printf(&cms, ' {{{2')<CR>A<SPACE><ESC>"ap
-" nnoremap g3 :let @a=printf(&cms, ' {{{3')<CR>A<SPACE><ESC>"ap
 nnoremap g1 A<SPACE>{{{1<ESC>
 nnoremap g2 A<SPACE>{{{2<ESC>
 nnoremap g3 A<SPACE>{{{3<ESC>
