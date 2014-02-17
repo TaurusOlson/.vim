@@ -58,6 +58,9 @@ augroup vimrc_group
     au FileType clojure nmap <buffer> <CR> :Eval<CR><Plug>(sexp_move_to_next_element_head)
     " Eval current line
     au FileType clojure nnoremap <buffer> <S-CR> :Eval<CR>
+    " Eval current line and write its result at the end of the line (use
+    " vim-fireplace)
+    au FileType clojure nmap <C-CR> yyp<Plug>FireplaceFilterabI;;<SPACE>=><SPACE><ESC>kJ0
 augroup END
 
 
@@ -88,9 +91,11 @@ nnoremap <Leader>bg :let &background = ( &background == "dark"? "light" : "dark"
 " Display syntax name or fg color 
 nnoremap <Leader>h :echo synIDattr(synID(line("."), col("."), 1), "name")<CR>
 nnoremap <Leader>H :echo synIDattr(synIDtrans(synID(line("."), col("."), 1)), "fg")<CR>
+" source $VIMRUNTIME/syntax/hitest.vim
 
 " Replace visual selection
 vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
+
 
 " NextTextObject          {{{2
 " Author: Steve Losh
@@ -107,7 +112,7 @@ function! s:NextTextObject(motion, dir)
   elseif c ==# "r"
       let c = "["
   endif
-
+ 
   exe "normal! ".a:dir.c."v".a:motion.c
 endfunction
 
@@ -120,7 +125,7 @@ onoremap al :<c-u>call <SID>NextTextObject('a', 'F')<cr>
 xnoremap al :<c-u>call <SID>NextTextObject('a', 'F')<cr>
 onoremap il :<c-u>call <SID>NextTextObject('i', 'F')<cr>
 xnoremap il :<c-u>call <SID>NextTextObject('i', 'F')<cr>
-
+ 
 " In insert mode {{{2
 inoremap <C-E> <ESC>A
 inoremap <C-A> <ESC>I
@@ -137,7 +142,7 @@ cnoremap <C-E> <END>
 
 " Navigation {{{2
 nnoremap ;e :Ex<CR>
-
+ 
 " Jump to definition and open it in vertical split 
 nnoremap <silent> <Leader>T :let word=expand("<cword>")<CR>:vsp<CR>:wincmd w<cr>:exec("tag ". word)<CR>
 
@@ -145,12 +150,14 @@ nnoremap <silent> <Leader>T :let word=expand("<cword>")<CR>:vsp<CR>:wincmd w<cr>
 nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 
 " Folds {{{2
-nnoremap <SPACE> za
-nnoremap g1 :let @a=printf(&cms, ' {{{1')<CR>A<SPACE><ESC>"ap
-nnoremap g2 :let @a=printf(&cms, ' {{{2')<CR>A<SPACE><ESC>"ap
-nnoremap g3 :let @a=printf(&cms, ' {{{3')<CR>A<SPACE><ESC>"ap
-
-
+nnoremap <SPACE> za 
+" nnoremap g1 :let @a=printf(&cms, ' {{{1')<CR>A<SPACE><ESC>"ap
+" nnoremap g2 :let @a=printf(&cms, ' {{{2')<CR>A<SPACE><ESC>"ap
+" nnoremap g3 :let @a=printf(&cms, ' {{{3')<CR>A<SPACE><ESC>"ap
+nnoremap g1 A<SPACE>{{{1<ESC>
+nnoremap g2 A<SPACE>{{{2<ESC>
+nnoremap g3 A<SPACE>{{{3<ESC>
+ 
 " Windows {{{2
 " Jump to a window
 nnoremap <C-h> <C-w>h
@@ -182,9 +189,7 @@ nnoremap Q :q<CR>
 set statusline =
 set statusline +=[%n]
 set statusline +=%f\ %h%m%r%w
-set statusline +=%y 
-set statusline +=%=%-10L
-set statusline +=%=%-14.(%l,%c%V%)\ %P
+set statusline +=%=%-14.(%l,%c%V%)
 
 
 " Options {{{1
@@ -228,7 +233,7 @@ if has('gui_running')
     set guioptions=g
     set guifont=Cousine:h14
     set linespace=5
-    colorscheme base16-default
+    colorscheme macvim
 else
     set t_Co=256
 endif
@@ -407,14 +412,19 @@ autocmd BufReadPost fugitive://* set bufhidden=delete
 autocmd FileType gitcommit setlocal cursorline
 
 
-" " SirVer/ultisnips {{{2
-" Plug 'SirVer/ultisnips'
-" let g:UltiSnipsExpandTrigger="<tab>"
-" let g:UltiSnipsJumpForwardTrigger="<tab>"
-" let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-" let g:UltiSnipsSnippetDir='~/.vim/snippets'
-" let g:UltiSnipsSnippetDirectories=['snippets']
-" nnoremap <LocalLeader>s :split ~/.vim/snippets<CR>
+" SirVer/ultisnips {{{2
+Plug 'SirVer/ultisnips'
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<tab>"
+let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+let g:UltiSnipsSnippetDir='~/.vim/snippets'
+let g:UltiSnipsSnippetDirectories=['snippets']
+nnoremap <LocalLeader>s :split ~/.vim/snippets<CR>
+
+
+" ervandew/supertab {{{2
+Plug 'ervandew/supertab'
+let g:SuperTabDefaultCompletionType = "<C-N>"
 
 
 " vimwiki/vimwiki {{{2
@@ -502,11 +512,6 @@ let Ws_Enable_Fold_Column = 0
 let Ws_WinWidth = 35
 
 
-" ervandew/supertab {{{2
-Plug 'ervandew/supertab'
-let g:SuperTabDefaultCompletionType = "<C-N>"
-
-
 " gregsexton/gitv {{{2
 Plug 'gregsexton/gitv'
 nnoremap gv :Gitv<CR>
@@ -550,5 +555,24 @@ Plug 'guns/vim-sexp'
 
 " wellle/targets.vim {{{2
 Plug 'wellle/targets.vim'
+
+
+" mhinz/vim-startify {{{2
+Plug 'mhinz/vim-startify'
+let g:startify_session_dir = '~/.vim/sessions'
+let g:startify_files_number = 4
+
+
+" junegunn/vim-pseudocl {{{2
+Plug 'junegunn/vim-pseudocl'
+
+
+" junegunn/vim-oblique {{{2
+Plug 'junegunn/vim-oblique'
+
+
+" Taurus/creature.vim {{{2
+Plug 'Taurus/creature.vim'
+
 
 call plug#end()
