@@ -254,7 +254,6 @@ if has('gui_running')
     set guioptions=g
     set guifont=Cousine:h14
     set linespace=5
-    colorscheme macvim
 else
     set t_Co=256
 endif
@@ -593,7 +592,7 @@ let g:startify_files_number = 4
 
 
 " Taurus/creature.vim {{{2
-Plug 'Taurus/creature.vim'
+Plug 'git@github.com:TaurusOlson/creature.vim.git'
 
 
 " vim-scripts/vcscommand.vim {{{2
@@ -607,9 +606,5 @@ Plug 'tpope/vim-dispatch'
 " kana/vim-textobj-user {{{2
 Plug 'kana/vim-textobj-user'
 
-
-" gcmt/tube.vim {{{2
-Plug 'gcmt/tube.vim'
-let g:tube_terminal = "iterm"
 
 call plug#end()
