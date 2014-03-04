@@ -13,8 +13,9 @@
 "
 "   Plug 'junegunn/seoul256.vim'
 "   Plug 'junegunn/vim-easy-align'
+"   Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
 "   " Plug 'user/repo1', 'branch_or_tag'
-"   " Plug 'user/repo2', { 'rtp': 'vim/plugin/dir', 'branch': 'devel' }
+"   " Plug 'user/repo2', { 'rtp': 'vim/plugin/dir', 'branch': 'branch_or_tag' }
 "   " ...
 "
 "   call plug#end()
@@ -110,10 +111,25 @@ function! plug#end()
 
   filetype off
   for plug in values(g:plugs)
-    let rtp = s:rtp(plug)
-    execute "set rtp^=".rtp
-    if isdirectory(rtp.'after')
-      execute "set rtp+=".rtp.'after'
+    if has_key(plug, 'on')
+      let commands = type(plug.on) == 1 ? [plug.on] : plug.on
+      for cmd in commands
+        if cmd =~ '^<Plug>.\+'
+          if empty(mapcheck(cmd)) && empty(mapcheck(cmd, 'i'))
+            for [mode, prefix] in [['i', "<C-O>"], ['', '']]
+              execute printf(
+              \ "%snoremap <silent> %s %s:call <SID>lod_map(%s, %s)<CR>",
+              \ mode, cmd, prefix, string(cmd), string(plug))
+            endfor
+          endif
+        elseif !exists(':'.cmd)
+          execute printf(
+          \ "command! -nargs=* -bang %s call s:lod_cmd(%s, '<bang>', <q-args>, %s)",
+          \ cmd, string(cmd), string(plug))
+        endif
+      endfor
+    else
+      call s:add_rtp(s:rtp(plug))
     endif
   endfor
   filetype plugin indent on
@@ -126,6 +142,44 @@ function! s:rtp(spec)
     let rtp = substitute(rtp, '\\*$', '', '')
   endif
   return rtp
+endfunction
+
+function! s:add_rtp(rtp)
+  execute "set rtp^=".a:rtp
+  if isdirectory(a:rtp.'after')
+    execute "set rtp+=".a:rtp.'after'
+  endif
+endfunction
+
+function! s:lod(plug)
+  let rtp = s:rtp(a:plug)
+  call s:add_rtp(rtp)
+  for dir in ['plugin', 'after']
+    for vim in split(globpath(rtp, dir.'/*.vim'), '\n')
+      execute 'source '.vim
+    endfor
+  endfor
+endfunction
+
+function! s:lod_cmd(cmd, bang, args, plug)
+  execute 'delc '.a:cmd
+  call s:lod(a:plug)
+  execute printf("%s%s %s", a:cmd, a:bang, a:args)
+endfunction
+
+function! s:lod_map(map, plug)
+  execute 'unmap '.a:map
+  execute 'iunmap '.a:map
+  call s:lod(a:plug)
+  let extra = ''
+  while 1
+    let c = getchar(0)
+    if c == 0
+      break
+    endif
+    let extra .= nr2char(c)
+  endwhile
+  call feedkeys(substitute(a:map, '^<Plug>', "\<Plug>", '') . extra)
 endfunction
 
 function! s:add(...)
