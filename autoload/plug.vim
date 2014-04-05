@@ -13,8 +13,9 @@
 "
 "   Plug 'junegunn/seoul256.vim'
 "   Plug 'junegunn/vim-easy-align'
+"   Plug 'junegunn/goyo.vim', { 'on': 'Goyo' }
 "   " Plug 'user/repo1', 'branch_or_tag'
-"   " Plug 'user/repo2', { 'rtp': 'vim/plugin/dir', 'branch': 'devel' }
+"   " Plug 'user/repo2', { 'rtp': 'vim/plugin/dir', 'branch': 'branch_or_tag' }
 "   " ...
 "
 "   call plug#end()
@@ -87,6 +88,8 @@ function! plug#begin(...)
 
   let g:plug_home = home
   let g:plugs = {}
+  " we want to keep track of the order plugins where registered.
+  let g:plugs_order = []
 
   command! -nargs=+ Plug        call s:add(1, <args>)
   command! -nargs=* PlugInstall call s:install(<f-args>)
@@ -109,11 +112,31 @@ function! plug#end()
   endwhile
 
   filetype off
-  for plug in values(g:plugs)
-    let rtp = s:rtp(plug)
-    execute "set rtp^=".rtp
-    if isdirectory(rtp.'after')
-      execute "set rtp+=".rtp.'after'
+  " we want to make sure the plugin directories are added to rtp in the same
+  " order that they are registered with the Plug command. since the s:add_rtp
+  " function uses ^= to add plugin directories to the front of the rtp, we
+  " need to loop through the plugins in reverse
+  for name in reverse(copy(g:plugs_order))
+    let plug = g:plugs[name]
+    if has_key(plug, 'on')
+      let commands = type(plug.on) == 1 ? [plug.on] : plug.on
+      for cmd in commands
+        if cmd =~ '^<Plug>.\+'
+          if empty(mapcheck(cmd)) && empty(mapcheck(cmd, 'i'))
+            for [mode, prefix] in [['i', "<C-O>"], ['', '']]
+              execute printf(
+              \ "%snoremap <silent> %s %s:call <SID>lod_map(%s, %s)<CR>",
+              \ mode, cmd, prefix, string(cmd), string(plug))
+            endfor
+          endif
+        elseif !exists(':'.cmd)
+          execute printf(
+          \ "command! -nargs=* -bang %s call s:lod_cmd(%s, '<bang>', <q-args>, %s)",
+          \ cmd, string(cmd), string(plug))
+        endif
+      endfor
+    else
+      call s:add_rtp(s:rtp(plug))
     endif
   endfor
   filetype plugin indent on
@@ -126,6 +149,48 @@ function! s:rtp(spec)
     let rtp = substitute(rtp, '\\*$', '', '')
   endif
   return rtp
+endfunction
+
+function! s:esc(path)
+  return substitute(a:path, ' ', '\\ ', 'g')
+endfunction
+
+function! s:add_rtp(rtp)
+  execute "set rtp^=".s:esc(a:rtp)
+  if isdirectory(a:rtp.'after')
+    execute "set rtp+=".s:esc(a:rtp.'after')
+  endif
+endfunction
+
+function! s:lod(plug)
+  let rtp = s:rtp(a:plug)
+  call s:add_rtp(rtp)
+  for dir in ['plugin', 'after']
+    for vim in split(globpath(rtp, dir.'/*.vim'), '\n')
+      execute 'source '.vim
+    endfor
+  endfor
+endfunction
+
+function! s:lod_cmd(cmd, bang, args, plug)
+  execute 'delc '.a:cmd
+  call s:lod(a:plug)
+  execute printf("%s%s %s", a:cmd, a:bang, a:args)
+endfunction
+
+function! s:lod_map(map, plug)
+  execute 'unmap '.a:map
+  execute 'iunmap '.a:map
+  call s:lod(a:plug)
+  let extra = ''
+  while 1
+    let c = getchar(0)
+    if c == 0
+      break
+    endif
+    let extra .= nr2char(c)
+  endwhile
+  call feedkeys(substitute(a:map, '^<Plug>', "\<Plug>", '') . extra)
 endfunction
 
 function! s:add(...)
@@ -163,6 +228,7 @@ function! s:add(...)
   let dir  = s:dirpath( fnamemodify(join([g:plug_home, name], '/'), ':p') )
   let spec = extend(opts, { 'dir': dir, 'uri': uri })
   let g:plugs[name] = spec
+  let g:plugs_order += [name]
 endfunction
 
 function! s:install(...)
@@ -276,7 +342,7 @@ function! s:extend(names)
     for name in a:names
       let plugfile = s:rtp(g:plugs[name]) . s:plug_file
       if filereadable(plugfile)
-        execute "source ". plugfile
+        execute "source ". s:esc(plugfile)
       endif
     endfor
   finally
@@ -305,13 +371,13 @@ function! s:update_serial(pull)
     for [name, spec] in items(todo)
       let done[name] = 1
       if isdirectory(spec.dir)
-        execute 'cd '.spec.dir
+        execute 'cd '.s:esc(spec.dir)
         let [valid, msg] = s:git_valid(spec, 0, 0)
         if valid
           let result = a:pull ?
-            \ system(
+            \ s:system(
             \ printf('git checkout -q %s 2>&1 && git pull origin %s 2>&1',
-            \   spec.branch, spec.branch)) : 'Already installed'
+            \   s:shellesc(spec.branch), s:shellesc(spec.branch))) : 'Already installed'
           let error = a:pull ? v:shell_error != 0 : 0
         else
           let result = msg
@@ -322,10 +388,11 @@ function! s:update_serial(pull)
           call mkdir(base, 'p')
         endif
         execute 'cd '.base
-        let d = shellescape(substitute(spec.dir, '[\/]\+$', '', ''))
-        let result = system(
+        let result = s:system(
               \ printf('git clone --recursive %s -b %s %s 2>&1',
-              \ shellescape(spec.uri), shellescape(spec.branch), d))
+              \ s:shellesc(spec.uri),
+              \ s:shellesc(spec.branch),
+              \ s:shellesc(substitute(spec.dir, '[\/]\+$', '', ''))))
         let error = v:shell_error != 0
       endif
       cd -
@@ -348,6 +415,10 @@ endfunction
 
 function! s:update_parallel(pull, threads)
   ruby << EOF
+  def esc arg
+    %["#{arg.gsub('"', '\"')}"]
+  end
+
   st    = Time.now
   require 'thread'
   require 'fileutils'
@@ -448,8 +519,10 @@ function! s:update_parallel(pull, threads)
           while pair = take1.call
             name = pair.first
             dir, uri, branch = pair.last.values_at *%w[dir uri branch]
+            branch = esc branch
             ok, result =
               if File.directory? dir
+                dir = esc dir
                 ret, data = bt.call "#{cd} #{dir} && git rev-parse --abbrev-ref HEAD 2>&1 && git config remote.origin.url"
                 current_uri = data.lines.to_a.last
                 if !ret
@@ -471,7 +544,7 @@ function! s:update_parallel(pull, threads)
                 end
               else
                 FileUtils.mkdir_p(base)
-                d = dir.sub(%r{[\\/]+$}, '')
+                d = esc dir.sub(%r{[\\/]+$}, '')
                 bt.call "#{cd} #{base} && git clone --recursive #{uri} -b #{branch} #{d} 2>&1"
               end
             log.call name, result, ok
@@ -503,6 +576,10 @@ function! s:dirpath(path)
   endif
 endfunction
 
+function! s:shellesc(arg)
+  return '"'.substitute(a:arg, '"', '\\"', 'g').'"'
+endfunction
+
 function! s:glob_dir(path)
   return map(filter(split(globpath(a:path, '**'), '\n'), 'isdirectory(v:val)'), 's:dirpath(v:val)')
 endfunction
@@ -526,12 +603,16 @@ function! s:format_message(ok, name, message)
   endif
 endfunction
 
+function! s:system(cmd)
+  return system(s:is_win ? '('.a:cmd.')' : a:cmd)
+endfunction
+
 function! s:git_valid(spec, check_branch, cd)
   let ret = 1
   let msg = 'OK'
   if isdirectory(a:spec.dir)
-    if a:cd | execute "cd " . a:spec.dir | endif
-    let result = split(system("git rev-parse --abbrev-ref HEAD 2>&1 && git config remote.origin.url"), '\n')
+    if a:cd | execute "cd " . s:esc(a:spec.dir) | endif
+    let result = split(s:system("git rev-parse --abbrev-ref HEAD 2>&1 && git config remote.origin.url"), '\n')
     let remote = result[-1]
     if v:shell_error != 0
       let msg = join([remote, "PlugClean required."], "\n")
@@ -603,7 +684,7 @@ function! s:clean(force)
     if yes
       for dir in todo
         if isdirectory(dir)
-          call system((s:is_win ? 'rmdir /S /Q ' : 'rm -rf ') . dir)
+          call system((s:is_win ? 'rmdir /S /Q ' : 'rm -rf ') . s:shellesc(dir))
         endif
       endfor
       call append(line('$'), 'Removed.')
@@ -616,8 +697,8 @@ endfunction
 
 function! s:upgrade()
   if executable('curl')
-    let mee = shellescape(s:me)
-    let new = shellescape(s:me . '.new')
+    let mee = s:shellesc(s:me)
+    let new = s:shellesc(s:me . '.new')
     echo "Downloading ". s:plug_source
     redraw
     let mv = s:is_win ? 'move /Y' : 'mv -f'
@@ -663,9 +744,7 @@ function! s:status()
   let ecnt = 0
   for [name, spec] in items(g:plugs)
     if isdirectory(spec.dir)
-      execute 'cd '.spec.dir
-      let [valid, msg] = s:git_valid(spec, 1, 0)
-      cd -
+      let [valid, msg] = s:git_valid(spec, 1, 1)
     else
       let [valid, msg] = [0, 'Not found. Try PlugInstall.']
     endif
