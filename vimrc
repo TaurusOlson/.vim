@@ -61,6 +61,8 @@ augroup vimrc_group
     " Eval current line and write its result at the end of the line (use
     " vim-fireplace)
     au FileType clojure nmap <C-CR> yyp<Plug>FireplaceFilterabI;;<SPACE>=><SPACE><ESC>kJ0
+    au FileType clojure imap <C-CR> <ESC>yyp<Plug>FireplaceFilterabI;;<SPACE>=><SPACE><ESC>kJ0
+    au FileType clojure nnoremap m'g$ f;D``
 augroup END
 
 
@@ -97,44 +99,11 @@ nnoremap <Leader>H :echo synIDattr(synIDtrans(synID(line("."), col("."), 1)), "f
 vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
 
 
-" NextTextObject          {{{2
-" Author: Steve Losh
-" Description: Motion for "next/last object". For example, "din(" would go to the next "()"
-" pair and delete its contents.
-
-function! s:NextTextObject(motion, dir)
-  let c = nr2char(getchar())
-
-  if c ==# "b"
-      let c = "("
-  elseif c ==# "B"
-      let c = "{"
-  elseif c ==# "r"
-      let c = "["
-  endif
- 
-  exe "normal! ".a:dir.c."v".a:motion.c
-endfunction
-
-onoremap an :<c-u>call <SID>NextTextObject('a', 'f')<cr>
-xnoremap an :<c-u>call <SID>NextTextObject('a', 'f')<cr>
-onoremap in :<c-u>call <SID>NextTextObject('i', 'f')<cr>
-xnoremap in :<c-u>call <SID>NextTextObject('i', 'f')<cr>
-
-onoremap al :<c-u>call <SID>NextTextObject('a', 'F')<cr>
-xnoremap al :<c-u>call <SID>NextTextObject('a', 'F')<cr>
-onoremap il :<c-u>call <SID>NextTextObject('i', 'F')<cr>
-xnoremap il :<c-u>call <SID>NextTextObject('i', 'F')<cr>
- 
 " In insert mode {{{2
 inoremap <C-E> <ESC>A
 inoremap <C-A> <ESC>I
 inoremap <C-K> <C-o>C
-" inoremap <C-b> <C-o>h
-" inoremap <C-f> <C-o>a
-" inoremap <C-n> <C-o>j
-" inoremap <C-k> <C-o>k
-" inoremap <C-^> <C-o><C-^>
+inoremap <C-^> <C-o><C-^>
 
 " In command mode {{{2
 cnoremap <C-A> <HOME>
@@ -149,6 +118,12 @@ nnoremap <silent> <Leader>T :let word=expand("<cword>")<CR>:vsp<CR>:wincmd w<cr>
 " Open a Quickfix window for the last search.
 nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 
+" Keep the cursor in place while joining lines (emilyst)
+nnoremap J mzJ`z
+ 
+" [count]S: Repeat [count] times the last modification
+nnoremap S :normal n.<CR>
+
 " Folds {{{2
 nnoremap <SPACE> za 
 nnoremap g1 A<SPACE>{{{1<ESC>
@@ -161,6 +136,7 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
+nnoremap <TAB> <C-w>w
 
 " Close a window
 nnoremap <C-c>h <C-w>h:q<CR>
@@ -183,13 +159,16 @@ nnoremap Q :q<CR>
 
 
 " Statusline {{{1
+
+" source ~/Desktop/sandbox/mode_switcher.vim
 set statusline =
 set statusline +=[%n]
-set statusline +=%f\ %h%m%r%w
+set statusline +=\ %f\ %h%m%r%w
 set statusline +=%=%-14.(%l,%c%V%)
 
 
 " Options {{{1
+set ttyfast
 set hlsearch
 set vb t_vb=
 set splitright
@@ -230,7 +209,6 @@ if has('gui_running')
     set guioptions=g
     set guifont=Cousine:h14
     set linespace=5
-    colorscheme macvim
 else
     set t_Co=256
 endif
@@ -364,11 +342,12 @@ endfunction
 
 command! -bar -nargs=0 ToggleFocus :call Focus()
 
+
 " Plugins {{{1
 
 call plug#begin('~/.vim/bundle')
 
-Plug 'mbbill/VimExplorer'
+Plug 'mbbill/VimExplorer', {'on': 'VE'}
 Plug 'jiangmiao/auto-pairs'
 Plug 'TaurusOlson/darkburn.vim'
 Plug 'vim-scripts/genutils'
@@ -379,6 +358,7 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sensible'
+Plug 'morhetz/gruvbox'
 
 
 " kien/ctrlp.vim {{{2
@@ -414,14 +394,18 @@ Plug 'SirVer/ultisnips'
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-let g:UltiSnipsSnippetDir='~/.vim/snippets'
-let g:UltiSnipsSnippetDirectories=['snippets']
-nnoremap <LocalLeader>s :split ~/.vim/snippets<CR>
+let g:UltiSnipsSnippetDir='~/.vim/ultisnippets'
+let g:UltiSnipsSnippetDirectories=['ultisnippets']
+nnoremap <LocalLeader>s :split ~/.vim/ultisnippets<CR>
 
 
 " ervandew/supertab {{{2
 Plug 'ervandew/supertab'
 let g:SuperTabDefaultCompletionType = "<C-N>"
+let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
+let g:SuperTabContextDiscoverDiscovery =
+    \ ["&omnifunc:<c-x><c-o>", "&completefunc:<c-x><c-u>",]
+let g:SuperTabDefaultCompletionType = "context"
 
 
 " vimwiki/vimwiki {{{2
@@ -434,10 +418,11 @@ let mywiki.template_path = '~/Dropbox/Blogs/vimwiki/templates/'
 let mywiki.template_default = 'def_template'
 let mywiki.template_ext = '.html'
 let mywiki.css_name = 'main.css'
-let mywiki.syntax = 'markdown'
+" let mywiki.syntax = ''
 let g:vimwiki_list = [mywiki]
 let g:vimwiki_ext2syntax = {'.wiki': 'media'}
 let g:vimwiki_hl_headers = 1
+let g:vimwiki_folding = 'syntax'
 
 
 " vim-scripts/Notes {{{2
@@ -497,7 +482,7 @@ command! -nargs=0 RunProcessing :call RunProcessing()
 
 
 " rking/ag.vim {{{2
-Plug 'rking/ag.vim'
+Plug 'rking/ag.vim', {'on': 'Ag'}
 nnoremap <Leader>a :Ag<SPACE><c-r>=expand("<cword>")<CR>
 nnoremap <Leader>A :Ag<SPACE>
 
@@ -510,7 +495,7 @@ let Ws_WinWidth = 35
 
 
 " gregsexton/gitv {{{2
-Plug 'gregsexton/gitv'
+Plug 'gregsexton/gitv', {'on': 'Gitv'}
 nnoremap gv :Gitv<CR>
 nnoremap gV :Gitv!<CR>
 
@@ -527,8 +512,16 @@ nnoremap ;g :GundoToggle<CR>
 
 
 " godlygeek/tabular {{{2
-Plug 'godlygeek/tabular'
-
+Plug 'godlygeek/tabular', {'on': 'Tabularize'}
+nnoremap <Leader>a<Space> :Tabularize  / /<CR>
+vnoremap <Leader>a<Space> :Tabularize  / /<CR>
+nnoremap <Leader>a=       :Tabularize  /=<CR>
+vnoremap <Leader>a=       :Tabularize  /=<CR>
+nnoremap <Leader>a:       :Tabularize  /:<CR>
+vnoremap <Leader>a:       :Tabularize  /:<CR>
+nnoremap <Leader>a,       :Tabularize  /,<CR>
+vnoremap <Leader>a,       :Tabularize  /,<CR>
+ 
 
 " tpope/vim-fireplace {{{2
 Plug 'tpope/vim-fireplace'
@@ -557,19 +550,37 @@ Plug 'wellle/targets.vim'
 " mhinz/vim-startify {{{2
 Plug 'mhinz/vim-startify'
 let g:startify_session_dir = '~/.vim/sessions'
-let g:startify_files_number = 4
-
-
-" junegunn/vim-pseudocl {{{2
-Plug 'junegunn/vim-pseudocl'
-
-
-" junegunn/vim-oblique {{{2
-Plug 'junegunn/vim-oblique'
+let g:startify_files_number = 10
 
 
 " Taurus/creature.vim {{{2
-Plug 'Taurus/creature.vim'
+Plug 'git@github.com:TaurusOlson/creature.vim.git'
+
+
+" someboddy/psearch.vim {{{2
+Plug 'someboddy/psearch.vim', {'on': 'PSearch'}
+nnoremap <D-s> :PSearch<CR>
+
+
+" tpope/vim-dispatch {{{2
+Plug 'tpope/vim-dispatch'
+
+
+" tpope/vim-projectile {{{2
+Plug 'tpope/vim-projectile'
+
+
+" eagletmt/ghcmod-vim {{{2
+Plug 'eagletmt/ghcmod-vim'
+
+
+" Shougo/vimproc {{{2
+Plug 'Shougo/vimproc'
+
+
+" tpope/timl {{{2
+Plug 'tpope/timl'
 
 
 call plug#end()
+
