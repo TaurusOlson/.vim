@@ -72,6 +72,10 @@ let maplocalleader = "\\"
 inoremap kj <ESC>
 nnoremap <C-SPACE> :w<CR>
 
+" Movements for wrapped lines
+nnoremap j gj
+nnoremap k gk
+
 " Source files
 nnoremap <Leader>u :so ~/.vimrc<CR>
 nnoremap <Leader>s :so %<CR>
@@ -79,6 +83,9 @@ nnoremap <Leader>s :so %<CR>
 " Edit files
 nnoremap <Leader>v :e ~/.vimrc<CR>
 nnoremap <Leader>V :sp ~/.vimrc<CR>
+
+" Search 
+nnoremap <Leader>* /\<\><Left><Left>
 
 " Tags
 nnoremap <Leader>t <C-]>
@@ -98,6 +105,8 @@ nnoremap <Leader>H :echo synIDattr(synIDtrans(synID(line("."), col("."), 1)), "f
 " Replace visual selection
 vnoremap <C-r> "hy:%s/<C-r>h//gc<left><left><left>
 
+" Display info
+nnoremap g<C-p> :pwd<CR>
 
 " In insert mode {{{2
 inoremap <C-E> <ESC>A
@@ -113,7 +122,7 @@ cnoremap <C-E> <END>
 nnoremap ;e :Ex<CR>
  
 " Jump to definition and open it in vertical split 
-nnoremap <silent> <Leader>T :let word=expand("<cword>")<CR>:vsp<CR>:wincmd w<cr>:exec("tag ". word)<CR>
+nnoremap <silent> <Leader>T :let word=expand("<cword>")<CR>:vertical topleft split<CR>:wincmd w<cr>:exec("tag ". word)<CR>
 
 " Open a Quickfix window for the last search.
 nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
@@ -129,7 +138,8 @@ nnoremap <SPACE> za
 nnoremap g1 A<SPACE>{{{1<ESC>
 nnoremap g2 A<SPACE>{{{2<ESC>
 nnoremap g3 A<SPACE>{{{3<ESC>
- 
+
+
 " Windows {{{2
 " Jump to a window
 nnoremap <C-h> <C-w>h
@@ -159,12 +169,17 @@ nnoremap Q :q<CR>
 
 
 " Statusline {{{1
-
 " source ~/Desktop/sandbox/mode_switcher.vim
 set statusline =
-set statusline +=[%n]
-set statusline +=\ %f\ %h%m%r%w
-set statusline +=%=%-14.(%l,%c%V%)
+set statusline +=[%n]                                    " buffer number
+set statusline +=\ %f                                    " Full path to file
+set statusline +=\ %1*%m%0*                              " modified flag
+set statusline +=\ %=%-20.30{tagbar#currenttag('%s','')} " Current function
+set statusline +=\ %h                                    " [help]
+set statusline +=%r                                      " read only flag
+set statusline +=%w                                      " preview window flag
+set statusline +=%=%-14.(%l,%c%V%)                       " Line, column-virtual column"
+set statusline +=%=lines:\ %-5L                          " Lines in the buffer
 
 
 " Options {{{1
@@ -172,7 +187,7 @@ set ttyfast
 set hlsearch
 set vb t_vb=
 set splitright
-set autowrite
+" set autowrite
 set shiftwidth=4
 set hidden
 set expandtab
@@ -181,6 +196,7 @@ set noswapfile
 set undofile
 set guicursor+=n-v-c:blinkon0
 set history=100
+set virtualedit=block
 
 " Adapt the background to the current time
 if strftime("%H") > 8 && strftime("%H") < 17
@@ -436,14 +452,17 @@ let g:notesWordSeparator = '_'
 " majutsushi/tagbar {{{2
 Plug 'majutsushi/tagbar'
 nnoremap ;t :TagbarToggle<CR>
+let g:tagbar_sort = 0
+let g:tagbar_compact = 1
+let g:tagbar_autopreview = 0
 
 
 " szw/vim-ctrlspace {{{2
 Plug 'szw/vim-ctrlspace'
 let g:ctrlspace_default_mapping_key = "<Leader><Space>"
 hi CtrlSpaceNormal guifg=fg guibg=bg
-hi CtrlSpaceSelected guifg=red guifg=bg gui=underline
-hi CtrlSpaceFound guifg=red guibg=NONE gui=underline
+hi CtrlSpaceSelected guifg=bg guibg=fg gui=none
+hi CtrlSpaceFound guifg=red guibg=NONE gui=none
 let g:ctrlspace_symbols = {
             \ "cs"      : "CS",
             \ "tab"     : "TAB",
@@ -486,6 +505,11 @@ Plug 'rking/ag.vim', {'on': 'Ag'}
 nnoremap <Leader>a :Ag<SPACE><c-r>=expand("<cword>")<CR>
 nnoremap <Leader>A :Ag<SPACE>
 
+" vim-scripts/Workspace-manager {{{2
+Plug 'https://github.com/vim-scripts/Workspace-Manager.git'
+nnoremap ;w :WsToggle<CR>
+let Ws_Enable_Fold_Column = 0
+let Ws_WinWidth = 35
 
 " vim-scripts/Workspace-manager {{{2
 Plug 'https://github.com/vim-scripts/Workspace-Manager.git'
@@ -580,6 +604,14 @@ Plug 'Shougo/vimproc'
 
 " tpope/timl {{{2
 Plug 'tpope/timl'
+
+
+" vim-scripts/vcscommand.vim {{{2
+Plug 'vim-scripts/vcscommand.vim'
+
+
+" tpope/vim-dispatch  {{{2
+Plug 'tpope/vim-dispatch'
 
 
 call plug#end()

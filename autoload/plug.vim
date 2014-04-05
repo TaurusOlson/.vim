@@ -112,12 +112,7 @@ function! plug#end()
   endwhile
 
   filetype off
-  " we want to make sure the plugin directories are added to rtp in the same
-  " order that they are registered with the Plug command. since the s:add_rtp
-  " function uses ^= to add plugin directories to the front of the rtp, we
-  " need to loop through the plugins in reverse
-  for name in reverse(copy(g:plugs_order))
-    let plug = g:plugs[name]
+  for plug in values(g:plugs)
     if has_key(plug, 'on')
       let commands = type(plug.on) == 1 ? [plug.on] : plug.on
       for cmd in commands
@@ -151,14 +146,10 @@ function! s:rtp(spec)
   return rtp
 endfunction
 
-function! s:esc(path)
-  return substitute(a:path, ' ', '\\ ', 'g')
-endfunction
-
 function! s:add_rtp(rtp)
-  execute "set rtp^=".s:esc(a:rtp)
+  execute "set rtp^=".a:rtp
   if isdirectory(a:rtp.'after')
-    execute "set rtp+=".s:esc(a:rtp.'after')
+    execute "set rtp+=".a:rtp.'after'
   endif
 endfunction
 
