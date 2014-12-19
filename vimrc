@@ -1,4 +1,4 @@
-" Taurus Olson's really minimalist vim configuration file
+" Taurus Olson's vim configuration file
 
 set nocompatible 
 
@@ -13,12 +13,16 @@ augroup vimrc_group
 
     " cd into the current directory
     autocmd BufEnter * if strpart(expand("%:h"), 0, 8) !=# 'fugitive' | silent cd %:p:h
+    autocmd BufEnter * if expand("%") !=# '.vimrc' | silent cd %:p:h
 
     " Resize splits when the window is resized
     autocmd VimResized * exe "normal! \<c-w>="
 
-    " Save when losing focus
+    " " Save when losing focus
     autocmd FocusLost * :silent! wall
+
+    au BufWinLeave * silent! mkview "make vim save view (state) (folds, cursor, etc)
+    au BufWinEnter * silent! loadview "make vim load view (state) (folds, cursor, etc)
 
     " Fold method is fold marker for any filetype
     autocmd Filetype vim,python setlocal fdm=marker
@@ -36,9 +40,14 @@ augroup vimrc_group
     autocmd FileType vim nnoremap <Leader>S ^vg_y:execute @@<CR>
 
     autocmd FileType python set softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
+    autocmd FileType python set omnifunc=pythoncomplete#Complete
     autocmd FileType reprocessed set fdm=syntax sw=2 textwidth=79 commentstring=//\ %s
     autocmd FileType reprocessed nnoremap <buffer> <LocalLeader>r :RunProcessing<CR>
     autocmd FileType reprocessed nnoremap <buffer> <LocalLeader>o :silent !open -a Processing.app %<CR>
+
+    " R
+    autocmd FileType r setlocal commentstring=#%s
+    autocmd FileType r set softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
 
     " CSS
     au Filetype css setlocal foldmethod=marker
@@ -63,7 +72,15 @@ augroup vimrc_group
     au FileType clojure nmap <C-CR> yyp<Plug>FireplaceFilterabI;;<SPACE>=><SPACE><ESC>kJ0
     au FileType clojure imap <C-CR> <ESC>yyp<Plug>FireplaceFilterabI;;<SPACE>=><SPACE><ESC>kJ0
     au FileType clojure nnoremap m'g$ f;D``
+
+    " Latex
+    au FileType tex let b:AutoClosePairs = AutoClose#ParsePairs("\" () \' [] {}")
+
 augroup END
+
+
+" HTML {{{1
+let g:html_indent_inctags = "html,body,head,tbody" 
 
 
 " Mappings {{{1
@@ -72,9 +89,30 @@ let maplocalleader = "\\"
 inoremap kj <ESC>
 nnoremap <C-SPACE> :w<CR>
 
-" Movements for wrapped lines
-nnoremap j gj
-nnoremap k gk
+" Use other mappings for ; and ,
+nnoremap ` ;
+nnoremap ù ,
+
+" Paste (by sheerun)
+vnoremap <silent> y y`]
+vnoremap <silent> p p`]
+nnoremap <silent> p p`]
+
+" Paste and indent
+nnoremap p ]p
+nnoremap P [p
+nnoremap =p :set paste!<CR>
+
+" Movements for paragraphs
+nnoremap <C-d> })
+nnoremap <C-u> {(
+
+" " Movements for wrapped lines
+" nnoremap j gj
+" nnoremap k gk
+
+" nnoremap n nzz
+" nnoremap N Nzz
 
 " Source files
 nnoremap <Leader>u :so ~/.vimrc<CR>
@@ -91,7 +129,12 @@ nnoremap <Leader>* /\<\><Left><Left>
 nnoremap <Leader>t <C-]>
 nnoremap <LocalLeader>t :!/usr/local/bin/ctags -R .<CR>
 
-nnoremap <Leader>n :set number!<CR>
+" Togglable options
+nnoremap cor :set relativenumber!<CR>
+nnoremap con :set number!<CR>
+nnoremap cul :set cul!<CR>
+nnoremap cuc :set cuc!<CR>
+
 nnoremap \<SPACE> :nohlsearch<CR>
 vnoremap $ g_
 nnoremap <Leader>cd :cd %:p:h<CR>
@@ -119,7 +162,7 @@ cnoremap <C-A> <HOME>
 cnoremap <C-E> <END>
 
 " Navigation {{{2
-nnoremap ;e :Ex<CR>
+nnoremap ;e :Explore<CR>
  
 " Jump to definition and open it in vertical split 
 nnoremap <silent> <Leader>T :let word=expand("<cword>")<CR>:vertical topleft split<CR>:wincmd w<cr>:exec("tag ". word)<CR>
@@ -138,7 +181,6 @@ nnoremap <SPACE> za
 nnoremap g1 A<SPACE>{{{1<ESC>
 nnoremap g2 A<SPACE>{{{2<ESC>
 nnoremap g3 A<SPACE>{{{3<ESC>
-
 
 " Windows {{{2
 " Jump to a window
@@ -169,11 +211,12 @@ nnoremap Q :q<CR>
 
 
 " Statusline {{{1
-" source ~/Desktop/sandbox/mode_switcher.vim
+hi default link User1 Error
 set statusline =
 set statusline +=[%n]                                    " buffer number
 set statusline +=\ %f                                    " Full path to file
 set statusline +=\ %1*%m%0*                              " modified flag
+set statusline +=%(\ %#StatusLineEnv#%{virtualenv#statusline()}%*%)
 set statusline +=\ %=%-20.30{tagbar#currenttag('%s','')} " Current function
 set statusline +=\ %h                                    " [help]
 set statusline +=%r                                      " read only flag
@@ -197,6 +240,9 @@ set undofile
 set guicursor+=n-v-c:blinkon0
 set history=100
 set virtualedit=block
+set grepprg=git\ grep\ -n\ $*
+set number
+" set grepprg=ag\ --nogroup\ --nocolor
 
 " Adapt the background to the current time
 if strftime("%H") > 8 && strftime("%H") < 17
@@ -205,10 +251,8 @@ else
     set background=dark
 endif
 
-
 " Folds
 set nofoldenable
-
 
 " Directories {{{2
 set undodir=~/.vim/tmp/undo/     " undo files
@@ -219,11 +263,12 @@ set directory=~/.vim/tmp/swap/   " swap files
 set tagstack          
 set tags=./tags,tags,.git/tags
 
-
 " GUI {{{2
 if has('gui_running')
     set guioptions=g
     set guifont=Cousine:h14
+    " set guifont=Inconsolata\ for\ Powerline:h16
+    " :h20
     set linespace=5
 else
     set t_Co=256
@@ -254,57 +299,6 @@ endfunction
 
 xnoremap * :call <SID>StarRange__keepReg()<CR>gv"*y/\V<C-R>=<SID>StarRange__substituteSpecialChars(@*)<CR><CR>:call <SID>StarRange__restoreReg()<CR>:echo<CR>
 xnoremap # :call <SID>StarRange__keepReg()<CR>gv"*y?\V<C-R>=<SID>StarRange__substituteSpecialChars(@*)<CR><CR>:call <SID>StarRange__restoreReg()<CR>:echo<CR>
-
-
-" Fuzzy matching {{{2
-" Author: junegunn
-
-function! s:fuzzy_matching()
-  set shortmess+=T " required :p
-  normal! m`
-
-  try
-    let mid = 0
-    let q = ''
-    while 1
-      redraw
-      echon "\rf/". q
-      let c  = getchar()
-      let ch = nr2char(c)
-
-      if ch == "\<C-C>" || ch == "\<Esc>" || (c == "\<bs>" && len(q) <= 1)
-        echon "\r".repeat(' ', len(q) + 2)
-        keepjumps normal! ``
-        break
-      elseif ch == "\<Enter>"    | let @/ = regex | set hls | break
-      elseif ch == "\<C-U>"      | let q  = ''
-      elseif c  == "\<bs>"       | let q  = q[0 : -2]
-      elseif ch =~ '[[:print:]]' | let q .= ch
-      else                       | continue
-      endif
-
-      let chars = map(split(q, '.\zs'), 'escape(v:val, "\\[]^$.*")')
-      let regex = join(
-        \ extend(map(chars[0 : -2], 'v:val . "[^" .v:val. "]\\{-}"'),
-        \ chars[-1:-1]), '')
-
-      silent! call matchdelete(mid)
-      keepjumps normal! ``
-      if !empty(regex)
-        if search('\c'.regex, 'c') == 0
-          keepjumps normal! ``
-        else
-          let mid = matchadd("IncSearch", '\c\%'.line('.').'l'.regex)
-        endif
-      endif
-    endwhile
-  finally
-    silent! call matchdelete(mid)
-    redraw
-  endtry
-endfunction
-
-nnoremap <silent> <leader>f :call <SID>fuzzy_matching()<cr>
 
 
 " Useful file manipulation functions {{{2
@@ -341,13 +335,17 @@ function! Focus()
     if g:focus_is_on ==# 0
         syntax off
         set cursorline
-        hi CursorLine guifg=red guibg=#1A1A1A
+        hi Cursor guifg=#1A1A1A guibg=#16a085
+        hi CursorLine guifg=#16a085 guibg=#1A1A1A
+        hi CursorLineNr guifg=#16a085 guibg=#1A1A1A
+        hi LineNr guifg=#333333 guibg=#1A1A1A
         hi Normal guifg=#777777 guibg=#1A1A1A
-        hi Statusline guifg=red guibg=#262626 gui=bold
+        hi Statusline guifg=#16a085 guibg=#262626 gui=bold
         hi StatuslineNC guifg=#777777 guibg=#262626 gui=bold
-        hi Visual guifg=red guibg=#262626 gui=bold
-        hi Search guifg=red guibg=#262626 gui=bold
-        hi IncSearch guifg=red guibg=#262626 gui=none
+        hi Visual guifg=#16a085 guibg=#262626 gui=bold
+        hi Search guifg=#16a085 guibg=#262626 gui=bold
+        hi IncSearch guifg=#16a085 guibg=#262626 gui=none
+        hi Folded guifg=#777777 guibg=#1A1A1A
         let g:focus_is_on = 1
     else
         syntax on
@@ -359,15 +357,47 @@ endfunction
 command! -bar -nargs=0 ToggleFocus :call Focus()
 
 
+" Evaluate Current line  {{{2
+" (inspired by http://vim.wikia.com/wiki/Evaluate_current_line_using_Python)
+" Usage: PyEv [r] [symb]
+" Examples: 
+" PyEv r: Write the result of the expression: x + y
+" 
+" PyEv : Print the result of the expression: x + y 
+" r replaces the empty string by the result
+python << EOL
+import vim
+
+def EvaluateCurrentLine(*args):
+    cur_str = vim.current.line
+    action, symb = None, "="
+    for i in args:
+        if i in ["r","p"]: 
+            action = i
+        else: 
+            symb = i
+    try: 
+        start = cur_str.rindex(symb)
+    except: 
+        start = len(cur_str)
+
+    result = eval(cur_str[:start],globals())
+    if action == "r":
+        vim.current.line = "%s%s %s" % (cur_str[:start], symb, result)
+    else:
+        print result
+EOL
+
+command! -narg=* PyEv python EvaluateCurrentLine(<f-args>)
+nnoremap <Leader>r :PyEv r =<CR>
+
+
 " Plugins {{{1
 
 call plug#begin('~/.vim/bundle')
 
-Plug 'mbbill/VimExplorer', {'on': 'VE'}
 Plug 'jiangmiao/auto-pairs'
 Plug 'TaurusOlson/darkburn.vim'
-Plug 'vim-scripts/genutils'
-Plug 'oinksoft/proj.vim'
 Plug 'reedes/vim-colors-pencil'
 Plug 'altercation/vim-colors-solarized'
 Plug 'tpope/vim-surround'
@@ -375,6 +405,11 @@ Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sensible'
 Plug 'morhetz/gruvbox'
+Plug 'TaurusOlson/graffik.vim'
+Plug 'git@github.com:TaurusOlson/creature.vim.git'
+Plug 'w0ng/vim-hybrid'
+Plug 'whatyouhide/vim-gotham'
+Plug 'vim-scripts/plum.vim'
 
 
 " kien/ctrlp.vim {{{2
@@ -382,14 +417,15 @@ Plug 'kien/ctrlp.vim'
 let g:ctrlp_buftag_ctags_bin = '/usr/local/bin/ctags'
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
-map <D-t> :CtrlP<CR>
+" map <D-t> :CtrlP<CR>
 map <D-b> :CtrlPBuffer<CR>
 map <D-g> :CtrlPBufTag<CR>
 map <D-r> :CtrlPCurFile<CR>
 nnoremap <D-u> :CtrlPMRU<CR>
 nnoremap <D-s> :CtrlP ~/.vim/bundle<CR>
-nnoremap <D-p> :CtrlPBookmarkDir<CR>
+" nnoremap <D-p> :CtrlPBookmarkDir<CR>
 nnoremap <LocalLeader>a :CtrlPBookmarkDirAdd .<CR>
+let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 
 
 " tpope/vim-fugitive {{{2
@@ -410,7 +446,7 @@ Plug 'SirVer/ultisnips'
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
-let g:UltiSnipsSnippetDir='~/.vim/ultisnippets'
+let g:UltiSnipsSnippetsDir='~/.vim/ultisnippets'
 let g:UltiSnipsSnippetDirectories=['ultisnippets']
 nnoremap <LocalLeader>s :split ~/.vim/ultisnippets<CR>
 
@@ -434,6 +470,7 @@ let mywiki.template_path = '~/Dropbox/Blogs/vimwiki/templates/'
 let mywiki.template_default = 'def_template'
 let mywiki.template_ext = '.html'
 let mywiki.css_name = 'main.css'
+" let mywiki.css_name = 'dark.css'
 " let mywiki.syntax = ''
 let g:vimwiki_list = [mywiki]
 let g:vimwiki_ext2syntax = {'.wiki': 'media'}
@@ -441,12 +478,12 @@ let g:vimwiki_hl_headers = 1
 let g:vimwiki_folding = 'syntax'
 
 
-" vim-scripts/Notes {{{2
-Plug 'vim-scripts/Notes'
-let g:notesRoot='~/Dropbox/Blogs/vimwiki/'
-let g:notesFileType = 'vimwiki'
-let g:notesFileExtension = '.wiki'
-let g:notesWordSeparator = '_'
+" " vim-scripts/Notes {{{2
+" Plug 'vim-scripts/Notes'
+" let g:notesRoot='~/Dropbox/Blogs/vimwiki/'
+" let g:notesFileType = 'vimwiki'
+" let g:notesFileExtension = '.wiki'
+" let g:notesWordSeparator = '_'
 
 
 " majutsushi/tagbar {{{2
@@ -455,67 +492,37 @@ nnoremap ;t :TagbarToggle<CR>
 let g:tagbar_sort = 0
 let g:tagbar_compact = 1
 let g:tagbar_autopreview = 0
+let g:tagbar_iconchars = ['▸','▾']
 
 
-" szw/vim-ctrlspace {{{2
-Plug 'szw/vim-ctrlspace'
-let g:ctrlspace_default_mapping_key = "<Leader><Space>"
-hi CtrlSpaceNormal guifg=fg guibg=bg
-hi CtrlSpaceSelected guifg=bg guibg=fg gui=none
-hi CtrlSpaceFound guifg=red guibg=NONE gui=none
-let g:ctrlspace_symbols = {
-            \ "cs"      : "CS",
-            \ "tab"     : "TAB",
-            \ "all"     : "ALL",
-            \ "add"     : "ADD",
-            \ "load"    : "LOAD",
-            \ "save"    : "SAVE",
-            \ "ord"     : "123",
-            \ "abc"     : "ABC",
-            \ "prv"     : "*",
-            \ "s_left"  : "[",
-            \ "s_right" : "]"
-            \ }
+" " szw/vim-ctrlspace {{{2
+" Plug 'szw/vim-ctrlspace', {'on': 'CtrlSpace'}
+" let g:ctrlspace_default_mapping_key = "<Leader><Space>"
+" hi CtrlSpaceNormal guifg=fg guibg=bg
+" hi CtrlSpaceSelected guifg=bg guibg=fg gui=none
+" hi CtrlSpaceFound guifg=red guibg=NONE gui=none
 
 
-" vim-scripts/opsplorer {{{2
-Plug 'vim-scripts/opsplorer'
-nnoremap ;v :call ToggleShowOpsplorer()<CR>
-autocmd BufEnter __Opsplorer__ set bufhidden=delete
+" " Processing {{{2
+" Plug 'goonzoid/vim-reprocessed'
+" autocmd BufRead,BufEnter *.pde nnoremap <buffer> ;s :split $PROJECTS/Processing/snippets<CR>
 
+" " Run procesing from the command line
+" function! RunProcessing()
+"      let s:fullpath  = expand("%:p:h")
+"      let s:splitpath = split(s:fullpath, '/')
+"      let s:processing_project = s:splitpath[-1]
+"      echo "Launching " .s:processing_project
+"      execute "silent !processing-java --output=/tmp/sketches/" .s:processing_project. "  --sketch=" .s:fullpath.  " --force --run &"
+" endfunction
 
-" Processing {{{2
-Plug 'goonzoid/vim-reprocessed'
-autocmd BufRead,BufEnter *.pde nnoremap <buffer> ;s :split $PROJECTS/Processing/snippets<CR>
-
-" Run procesing from the command line
-function! RunProcessing()
-     let s:fullpath  = expand("%:p:h")
-     let s:splitpath = split(s:fullpath, '/')
-     let s:processing_project = s:splitpath[-1]
-     echo "Launching " .s:processing_project
-     execute "silent !processing-java --output=/tmp/sketches/" .s:processing_project. "  --sketch=" .s:fullpath.  " --force --run &"
-endfunction
-
-command! -nargs=0 RunProcessing :call RunProcessing()
+" command! -nargs=0 RunProcessing :call RunProcessing()
 
 
 " rking/ag.vim {{{2
 Plug 'rking/ag.vim', {'on': 'Ag'}
-nnoremap <Leader>a :Ag<SPACE><c-r>=expand("<cword>")<CR>
+nnoremap <Leader>a :Ag!<SPACE><c-r>=expand('<cword>')<CR><CR>
 nnoremap <Leader>A :Ag<SPACE>
-
-" vim-scripts/Workspace-manager {{{2
-Plug 'https://github.com/vim-scripts/Workspace-Manager.git'
-nnoremap ;w :WsToggle<CR>
-let Ws_Enable_Fold_Column = 0
-let Ws_WinWidth = 35
-
-" vim-scripts/Workspace-manager {{{2
-Plug 'https://github.com/vim-scripts/Workspace-Manager.git'
-nnoremap ;w :WsToggle<CR>
-let Ws_Enable_Fold_Column = 0
-let Ws_WinWidth = 35
 
 
 " gregsexton/gitv {{{2
@@ -530,89 +537,144 @@ let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_initial_foldlevel=0
 
 
-" sjl/gundo.vim {{{2
-Plug 'sjl/gundo.vim'
-nnoremap ;g :GundoToggle<CR>
-
-
 " godlygeek/tabular {{{2
 Plug 'godlygeek/tabular', {'on': 'Tabularize'}
-nnoremap <Leader>a<Space> :Tabularize  / /<CR>
-vnoremap <Leader>a<Space> :Tabularize  / /<CR>
-nnoremap <Leader>a=       :Tabularize  /=<CR>
-vnoremap <Leader>a=       :Tabularize  /=<CR>
-nnoremap <Leader>a:       :Tabularize  /:<CR>
-vnoremap <Leader>a:       :Tabularize  /:<CR>
-nnoremap <Leader>a,       :Tabularize  /,<CR>
-vnoremap <Leader>a,       :Tabularize  /,<CR>
+nnoremap =a<Space> :Tabularize  / /<CR>
+vnoremap =a<Space> :Tabularize  / /<CR>
+nnoremap =a=       :Tabularize  /=<CR>
+vnoremap =a=       :Tabularize  /=<CR>
+nnoremap =a:       :Tabularize  /:<CR>
+vnoremap =a:       :Tabularize  /:<CR>
+nnoremap =a,       :Tabularize  /,<CR>
+vnoremap =a,       :Tabularize  /,<CR>
  
-
-" tpope/vim-fireplace {{{2
-Plug 'tpope/vim-fireplace'
-
-
-" tpope/vim-classpath {{{2
-Plug 'tpope/vim-classpath'
-
-
-" tpope/vim-sexp-mappings-for-regular-people {{{2
-Plug 'tpope/vim-sexp-mappings-for-regular-people'
-
-
-" guns/vim-clojure-static {{{2
-Plug 'guns/vim-clojure-static'
-
-
-" guns/vim-sexp {{{2
-Plug 'guns/vim-sexp'
-
 
 " wellle/targets.vim {{{2
 Plug 'wellle/targets.vim'
 
 
-" mhinz/vim-startify {{{2
-Plug 'mhinz/vim-startify'
-let g:startify_session_dir = '~/.vim/sessions'
-let g:startify_files_number = 10
+" " chrisbra/csv.vim {{{2
+" Plug 'chrisbra/csv.vim'
 
 
-" Taurus/creature.vim {{{2
-Plug 'git@github.com:TaurusOlson/creature.vim.git'
+" " gerw/vim-latex-suite {{{2
+" Plug 'gerw/vim-latex-suite'
 
 
-" someboddy/psearch.vim {{{2
-Plug 'someboddy/psearch.vim', {'on': 'PSearch'}
-nnoremap <D-s> :PSearch<CR>
+" " vim-scripts/project.tar.gz {{{2
+" Plug 'vim-scripts/project.tar.gz'
 
 
-" tpope/vim-dispatch {{{2
-Plug 'tpope/vim-dispatch'
+" jmcantrell/vim-virtualenv {{{2
+Plug 'jmcantrell/vim-virtualenv'
+let g:virtualenv_stl_format = '[%n]'
 
 
-" tpope/vim-projectile {{{2
-Plug 'tpope/vim-projectile'
+" " mattn/emmet-vim {{{2
+" Plug 'mattn/emmet-vim'
+" let g:user_emmet_leader_key = '<c-z>'
 
 
-" eagletmt/ghcmod-vim {{{2
-Plug 'eagletmt/ghcmod-vim'
+" terryma/vim-smooth-scroll {{{2
+Plug 'terryma/vim-smooth-scroll'
+noremap <silent> <c-b> :call smooth_scroll#up(&scroll*2, 10, 4)<CR>
+noremap <silent> <c-f> :call smooth_scroll#down(&scroll*2, 10, 4)<CR>
 
 
-" Shougo/vimproc {{{2
-Plug 'Shougo/vimproc'
+" vim-scripts/Vim-R-plugin {{{2
+Plug 'jcfaria/Vim-R-plugin'
+" Lines added by the Vim-R-plugin command :RpluginConfig (2014-Sep-24 00:10):
+" Press the space bar to send lines (in Normal mode) and selections to R:
+autocmd FileType r vmap <buffer> <Space> <Plug>RDSendSelection
+autocmd FileType r nmap <buffer> <Space> <Plug>RDSendLine
 
 
-" tpope/timl {{{2
-Plug 'tpope/timl'
+" csexton/jekyll.vim {{{2
+Plug 'csexton/jekyll.vim'
+let g:jekyll_path = "~/Blog/taurusolson.github.com"
 
 
-" vim-scripts/vcscommand.vim {{{2
-Plug 'vim-scripts/vcscommand.vim'
+" jeffkreeftmeijer/vim-numbertoggle {{{2
+Plug 'jeffkreeftmeijer/vim-numbertoggle'
 
 
-" tpope/vim-dispatch  {{{2
-Plug 'tpope/vim-dispatch'
+" christoomey/vim-tmux-runner {{{2
+" Plug 'christoomey/vim-tmux-runner'
+
+
+" christoomey/vim-tmux-navigator {{{2
+" Plug 'christoomey/vim-tmux-navigator'
+" nnoremap <silent> {Left-mapping} :TmuxNavigateLeft<cr>
+" nnoremap <silent> {Down-Mapping} :TmuxNavigateDown<cr>
+" nnoremap <silent> {Up-Mapping} :TmuxNavigateUp<cr>
+" nnoremap <silent> {Right-Mapping} :TmuxNavigateRight<cr>
+" nnoremap <silent> {Previous-Mapping} :TmuxNavigatePrevious<cr>
+
+
+" itchyny/lightline.vim {{{2
+Plug 'itchyny/lightline.vim'
+let g:lightline = { 
+            \ 'colorscheme': 'wombat',
+            \ 'separator': { 'left': '⮀', 'right': '⮂' },
+            \ 'subseparator': { 'left': '⮁', 'right': '⮃' }
+            \ }
+
+let g:lightline.active = {
+            \ 'left': [['mode', 'paste', 'modified'], ['filename', 'fugitive']],
+            \ 'right': [['tagbar', 'lineinfo']],
+            \ }
+
+let g:lightline.inactive = {
+            \ 'left': [['mode', 'paste'], ['filename', 'fugitive']],
+            \ 'right': [['lineinfo']],
+            \ }
+
+let g:lightline.component_function = {
+            \ 'fugitive': 'MyFugitive',
+            \ 'tagbar': 'MyTagBar'}
+
+" let g:lightline.tab = {
+"             \ 'active': [ 'tabnum', 'filename', 'modified' ],
+"             \ 'inactive': [ 'tabnum', 'filename', 'modified' ] }
+
+augroup LightLineColorscheme
+    autocmd!
+    autocmd ColorScheme * call s:lightline_update()
+augroup END
+
+function! s:lightline_update()
+    if !exists('g:loaded_lightline')
+        return
+    endif
+    try
+        if g:colors_name =~# 'wombat\|solarized\|landscape\|jellybeans\|Tomorrow'
+            let g:lightline.colorscheme =
+                        \ substitute(substitute(g:colors_name, '-', '_', 'g'), '256.*', '', '') .
+                        \ (g:colors_name ==# 'solarized' ? '_' . &background : '')
+            call lightline#init()
+            call lightline#colorscheme()
+            call lightline#update()
+        endif
+    catch
+    endtry
+endfunction
+
+function! MyFugitive()
+    if &ft !~? 'vimfiler' && exists("*fugitive#head")
+        " return fugitive#head()
+        return fugitive#statusline()
+    endif
+    return ''
+endfunction
+
+function! MyTagBar()
+    return tagbar#currenttag('%s','')
+endfunction
+
+
+" mbbill/undotree {{{2
+Plug 'mbbill/undotree'
+nnoremap ;g :UndotreeToggle<CR>
 
 
 call plug#end()
-

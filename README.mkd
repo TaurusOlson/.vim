@@ -1,18 +1,16 @@
 # My vim configuration
 
 This .vimrc file provides a minimum and efficient configuration for Vim. 
-It uses [pathogen](https://github.com/tpope/vim-pathogen) as a plugin manager.
+It uses [vim-plug](https://github.com/junegunn/vim-plug) as a plugin manager.
 
 
 ## Features 
 
-* Easy project management with proj.vim and opsplorer (a simpler file explorer
-  than NERDTree.)
-* Awesome workspace management with ctrlspace.vim.
 * Snippets with ultisnips.
 * Tags visualization with tagbar.vim
-* Easy note-taking with the combination of vimwiki and Notes.
+* A personal wiki using vimwiki
 * Fuzzy file, buffer, mru, tag finder with ctrlp
+* git support with fugitive
  
 
 ## Installation
@@ -23,14 +21,9 @@ $ make setup
 $ make install
 ```
 
+
 ## Upgrade
 
 ```
 make upgrade
 ```
-
-
-
-## Plugins
-
-See GitFile
