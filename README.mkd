@@ -17,13 +17,7 @@ It uses [vim-plug](https://github.com/junegunn/vim-plug) as a plugin manager.
 
 ```
 $ git clone https://github.com/TaurusOlson/.vim 
-$ make setup
 $ make install
 ```
 
 
-## Upgrade
-
-```
-make upgrade
-```
