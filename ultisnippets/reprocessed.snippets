@@ -1,0 +1,66 @@
+snippet header
+/*
+ *    `!p snip.rv = snip.fn`
+ *    ${1:description}
+ * 
+ *    Author: Taurus Olson <taurusolson@gmail.com>
+ *    Creation date: `LC_ALL=en_EN.UTF-8; date "+%b %d, %Y"`
+ *
+ */
+
+endsnippet
+
+snippet NOC
+The Nature of Code
+endsnippet
+
+snippet fori
+for (int ${1:i} = 0; $1 < ${2:n}; $1++) {
+  $0
+}
+endsnippet
+
+snippet if 
+if ($1) {
+  $0
+}
+endsnippet
+
+snippet toxi
+import toxi.physics2d.*;
+import toxi.physics2d.behaviors.*;
+import toxi.geom.*;
+
+endsnippet
+
+snippet physics
+physics = new VerletPhysics2D();
+physics.addBehavior(new GravityBehavior(new Vec2D(0, 0.5)));
+physics.setWorldBounds(new Rect(0, 0, width, height));
+endsnippet
+
+snippet pushMatrix
+pushMatrix();
+$0
+popMatrix();
+endsnippet
+
+snippet class
+class ${1:className} {
+  $1(${2:args}) {
+    $0;
+  }
+}
+endsnippet
+
+snippet void
+void ${1:method}(${1:args}) {
+  $0;
+}
+endsnippet
+
+snippet beginShape
+beginShape();
+$0;
+endShape(CLOSE);
+endsnippet
