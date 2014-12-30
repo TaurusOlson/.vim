@@ -1,9 +1,8 @@
-setup:
-	./bin/setup.sh
-
 install:
-	python bin/install_bundles.py GitFile
+	vim +PlugInstall
 
 update:
-	python bin/update_bundles.py
+	vim +PlugUpdate
 
+clean:
+	rm -rf view tmp sessions
