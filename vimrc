@@ -13,7 +13,7 @@ augroup vimrc_group
 
     " cd into the current directory
     autocmd BufEnter * if strpart(expand("%:h"), 0, 8) !=# 'fugitive' | silent cd %:p:h
-    autocmd BufEnter * if expand("%") !=# '.vimrc' | silent cd %:p:h
+    autocmd BufEnter * if expand("%") !=# "~/.vimrc" | silent cd %:p:h
 
     " Resize splits when the window is resized
     autocmd VimResized * exe "normal! \<c-w>="
@@ -25,7 +25,7 @@ augroup vimrc_group
     au BufWinEnter * silent! loadview "make vim load view (state) (folds, cursor, etc)
 
     " Fold method is fold marker for any filetype
-    autocmd Filetype vim,python setlocal fdm=marker
+    autocmd Filetype vim,python,r setlocal fdm=marker
 
     " Prevent auto comment prefixing
     autocmd FileType * setlocal formatoptions-=r formatoptions-=o
@@ -39,8 +39,10 @@ augroup vimrc_group
     " Execute the current line
     autocmd FileType vim nnoremap <Leader>S ^vg_y:execute @@<CR>
 
+    " PYTHON
     autocmd FileType python set softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
     autocmd FileType python set omnifunc=pythoncomplete#Complete
+
     autocmd FileType reprocessed set fdm=syntax sw=2 textwidth=79 commentstring=//\ %s
     autocmd FileType reprocessed nnoremap <buffer> <LocalLeader>r :RunProcessing<CR>
     autocmd FileType reprocessed nnoremap <buffer> <LocalLeader>o :silent !open -a Processing.app %<CR>
@@ -57,6 +59,7 @@ augroup vimrc_group
     " Sort properties alphabetically
     au FileType css nnoremap <buffer> <LocalLeader>S ?{<CR>jV/\v^\s*\}?$<CR>k:sort<CR>:noh<CR>
 
+    " RST
     au FileType rst setlocal suffixesadd=.rst
 
     " Quickfix
@@ -72,9 +75,6 @@ augroup vimrc_group
     au FileType clojure nmap <C-CR> yyp<Plug>FireplaceFilterabI;;<SPACE>=><SPACE><ESC>kJ0
     au FileType clojure imap <C-CR> <ESC>yyp<Plug>FireplaceFilterabI;;<SPACE>=><SPACE><ESC>kJ0
     au FileType clojure nnoremap m'g$ f;D``
-
-    " Latex
-    au FileType tex let b:AutoClosePairs = AutoClose#ParsePairs("\" () \' [] {}")
 
 augroup END
 
@@ -254,10 +254,22 @@ endif
 " Folds
 set nofoldenable
 
+
 " Directories {{{2
 set undodir=~/.vim/tmp/undo/     " undo files
 set backupdir=~/.vim/tmp/backup/ " backups
 set directory=~/.vim/tmp/swap/   " swap files
+
+if !isdirectory(expand(&undodir))
+    call mkdir(expand(&undodir), "p")
+endif
+if !isdirectory(expand(&backupdir))
+    call mkdir(expand(&backupdir), "p")
+endif
+if !isdirectory(expand(&directory))
+    call mkdir(expand(&directory), "p")
+endif
+
 
 " Tags {{{2
 set tagstack          
@@ -267,8 +279,6 @@ set tags=./tags,tags,.git/tags
 if has('gui_running')
     set guioptions=g
     set guifont=Cousine:h14
-    " set guifont=Inconsolata\ for\ Powerline:h16
-    " :h20
     set linespace=5
 else
     set t_Co=256
@@ -329,74 +339,9 @@ command! -nargs=1 -complete=file Mv :call RenameFile(<f-args>)
 command! -bar -range Source silent <line1>,<line2>yank z | let @z = substitute(@z, '\n\s*\\', '', 'g') | @z
 
 
-" Focus mode {{{2
-let g:focus_is_on = 0
-function! Focus() 
-    if g:focus_is_on ==# 0
-        syntax off
-        set cursorline
-        hi Cursor guifg=#1A1A1A guibg=#16a085
-        hi CursorLine guifg=#16a085 guibg=#1A1A1A
-        hi CursorLineNr guifg=#16a085 guibg=#1A1A1A
-        hi LineNr guifg=#333333 guibg=#1A1A1A
-        hi Normal guifg=#777777 guibg=#1A1A1A
-        hi Statusline guifg=#16a085 guibg=#262626 gui=bold
-        hi StatuslineNC guifg=#777777 guibg=#262626 gui=bold
-        hi Visual guifg=#16a085 guibg=#262626 gui=bold
-        hi Search guifg=#16a085 guibg=#262626 gui=bold
-        hi IncSearch guifg=#16a085 guibg=#262626 gui=none
-        hi Folded guifg=#777777 guibg=#1A1A1A
-        let g:focus_is_on = 1
-    else
-        syntax on
-        set cursorline!
-        let g:focus_is_on = 0
-    endif
-endfunction
-
-command! -bar -nargs=0 ToggleFocus :call Focus()
-
-
-" Evaluate Current line  {{{2
-" (inspired by http://vim.wikia.com/wiki/Evaluate_current_line_using_Python)
-" Usage: PyEv [r] [symb]
-" Examples: 
-" PyEv r: Write the result of the expression: x + y
-" 
-" PyEv : Print the result of the expression: x + y 
-" r replaces the empty string by the result
-python << EOL
-import vim
-
-def EvaluateCurrentLine(*args):
-    cur_str = vim.current.line
-    action, symb = None, "="
-    for i in args:
-        if i in ["r","p"]: 
-            action = i
-        else: 
-            symb = i
-    try: 
-        start = cur_str.rindex(symb)
-    except: 
-        start = len(cur_str)
-
-    result = eval(cur_str[:start],globals())
-    if action == "r":
-        vim.current.line = "%s%s %s" % (cur_str[:start], symb, result)
-    else:
-        print result
-EOL
-
-command! -narg=* PyEv python EvaluateCurrentLine(<f-args>)
-nnoremap <Leader>r :PyEv r =<CR>
-
-
 " Plugins {{{1
-
 call plug#begin('~/.vim/bundle')
 
-Plug 'jiangmiao/auto-pairs'
 Plug 'TaurusOlson/darkburn.vim'
 Plug 'reedes/vim-colors-pencil'
 Plug 'altercation/vim-colors-solarized'
@@ -570,8 +515,8 @@ Plug 'jmcantrell/vim-virtualenv'
 let g:virtualenv_stl_format = '[%n]'
 
 
-" " mattn/emmet-vim {{{2
-" Plug 'mattn/emmet-vim'
+" mattn/emmet-vim {{{2
+Plug 'mattn/emmet-vim'
 " let g:user_emmet_leader_key = '<c-z>'
 
 
@@ -675,6 +620,14 @@ endfunction
 " mbbill/undotree {{{2
 Plug 'mbbill/undotree'
 nnoremap ;g :UndotreeToggle<CR>
+
+
+" tpope/vim-vinegar {{{2
+Plug 'tpope/vim-vinegar'
+
+
+" Raimondi/delimitMate
+Plug 'Raimondi/delimitMate'
 
 
 call plug#end()
