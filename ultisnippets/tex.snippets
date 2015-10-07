@@ -120,4 +120,36 @@ endsnippet
 snippet lp "Long parenthesis"
 \left(${1:${VISUAL:contents}}\right)$0
 endsnippet
+
+snippet eqn "eqnarray" b
+\begin{eqnarray}
+    ${1}
+    \label{eq:${2}}
+\end{eqnarray}
+
+${0}
+endsnippet
+
+snippet equ "equation" b
+\begin{equation}
+    ${1}
+    \label{eq:${2}}
+\end{equation}
+
+${0}
+endsnippet
+
+snippet lab "label" b
+\label{${1}}$0
+endsnippet
+
+snippet ref "ref" b
+\ref{${1}}$0
+endsnippet
+
+snippet dfrac "dfrac" b
+\dfrac{${1:num}}{${2:denom}}
+endsnippet
+
+
 # vim:ft=snippets:
