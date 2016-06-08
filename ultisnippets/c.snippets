@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 endsnippet
 
 snippet for "for loop (for)"
-for (${2:i} = 0; $2 < ${1:count}; ${3:++$2})
+for (int ${2:i} = 0; $2 < ${1:count}; ${3:$2++})
 {
 	${VISUAL}${0:${VISUAL/(.*)/(?1::\/* code *\/)/}}
 }
@@ -128,7 +128,7 @@ else
 }
 endsnippet
 
-snippet printf "printf .. (printf)"
+snippet pr "printf .. (printf)"
 printf("${1:%s}\n"${1/([^%]|%%)*(%.)?.*/(?2:, :\);)/}$2${1/([^%]|%%)*(%.)?.*/(?2:\);)/}
 endsnippet
 

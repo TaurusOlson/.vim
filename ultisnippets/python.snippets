@@ -125,9 +125,7 @@ endglobal
 
 snippet class "class with docstrings" b
 class ${1:MyClass}(${2:object}):
-
 	`!p snip.rv = tripple_quotes(snip)`${3:Docstring for $1. }`!p snip.rv = tripple_quotes(snip)`
-
 	def __init__(self$4):
 		`!p snip.rv = tripple_quotes(snip)`${5:@todo: to be defined1.}`!p
 snip.rv = ""
@@ -541,6 +539,16 @@ snippet total "Total price" b
 ${1:1} bottles at ${2:10} = `!p
 snip.rv = float(t[1]) * float(t[2])
 ` euros
+endsnippet
+
+
+snippet :p "Parameter of a function" b
+:param ${1:name}: ${2:desc}
+endsnippet
+
+
+snippet :r "What a function returns" b
+:returns: ${1:desc}
 endsnippet
 
 # vim:ft=snippets:
