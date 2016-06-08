@@ -1,8 +1,6 @@
 " Taurus Olson's really minimalist mvim configuration file
 
 
-colorscheme hybrid
-
 " Disable <D-o>
 macmenu File.Open\.\.\. key=<nop>
 
