@@ -16,7 +16,7 @@ augroup vimrc_group
     " autocmd BufEnter * if expand("%") !=# "~/.vimrc" | silent cd %:p:h
 
     " cd into the root of the source code repo
-    autocmd BufEnter * exe 'RepoRoot '.expand('%')
+    autocmd BufEnter * exe 'RepoRoot '.expand('%:p:h')
     autocmd Filetype crontab  setlocal nobackup nowritebackup
 
     " Resize splits when the window is resized
