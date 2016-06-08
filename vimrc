@@ -12,18 +12,15 @@ augroup vimrc_group
     autocmd!
 
     " cd into the current directory
-    autocmd BufEnter * if strpart(expand("%:h"), 0, 8) !=# 'fugitive' | silent cd %:p:h
-    autocmd BufEnter * if expand("%") !=# "~/.vimrc" | silent cd %:p:h
+    " autocmd BufEnter * if strpart(expand("%:h"), 0, 8) !=# 'fugitive' | silent cd %:p:h
+    " autocmd BufEnter * if expand("%") !=# "~/.vimrc" | silent cd %:p:h
     autocmd Filetype crontab  setlocal nobackup nowritebackup
 
     " Resize splits when the window is resized
     autocmd VimResized * exe "normal! \<c-w>="
 
-    " " Save when losing focus
+    " Save when losing focus
     autocmd FocusLost * :silent! wall
-
-    " autocmd BufWinLeave * silent! mkview "make vim save view (state) (folds, cursor, etc)
-    " autocmd BufWinEnter * silent! loadview "make vim load view (state) (folds, cursor, etc)
 
     " Fold method is fold marker for any filetype
     autocmd Filetype vim,python,r setlocal fdm=marker
@@ -41,16 +38,17 @@ augroup vimrc_group
     autocmd FileType vim nnoremap <Leader>S ^vg_y:execute @@<CR>
 
     " PYTHON
-    autocmd FileType python set softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
-    autocmd FileType python set omnifunc=pythoncomplete#Complete
+    autocmd FileType python setlocal softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
+    autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 
-    autocmd FileType reprocessed set fdm=syntax sw=2 ts=2 textwidth=79 commentstring=//\ %s
+    " PROCESSING
+    autocmd FileType reprocessed setlocal fdm=syntax sw=2 ts=2 textwidth=79 commentstring=//\ %s
     autocmd FileType reprocessed nnoremap <buffer> <LocalLeader>r :RunProcessing<CR>
     autocmd FileType reprocessed nnoremap <buffer> <LocalLeader>o :silent !open -a Processing.app %<CR>
 
     " R
     autocmd FileType r setlocal commentstring=#%s
-    autocmd FileType r set softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
+    autocmd FileType r setlocal softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
 
     " CSS
     autocmd Filetype css setlocal foldmethod=marker
@@ -79,7 +77,14 @@ augroup vimrc_group
 
     autocmd QuickFixCmdPost grep,make,grepadd,vimgrep,vimgrepadd,cscope,cfile,cgetfile,caddfile,helpgrep cwindow
     autocmd QuickFixCmdPost lgrep,lmake,lgrepadd,lvimgrep,lvimgrepadd,lfile,lgetfile,laddfile lwindow
-augroup END
+
+    " LATEX
+    autocmd FileType tex inoremap <buffer> é \'e
+    autocmd FileType tex inoremap <buffer> è \`e
+    autocmd FileType tex inoremap <buffer> à \`a
+
+    " GO
+    autocmd FileType go setlocal softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
 
 augroup END
 
@@ -93,10 +98,6 @@ let mapleader = ","
 let maplocalleader = "\\"
 inoremap kj <ESC>
 nnoremap <C-SPACE> :w<CR>
-
-" Use other mappings for ; and ,
-" nnoremap ` ;
-" nnoremap ù ,
 
 " Paste (by sheerun)
 vnoremap <silent> y y`]
@@ -112,20 +113,13 @@ nnoremap =p :set paste!<CR>
 nnoremap <C-d> })
 nnoremap <C-u> {(
 
-" " Movements for wrapped lines
-" nnoremap j gj
-" nnoremap k gk
-
-" nnoremap n nzz
-" nnoremap N Nzz
-
 " Source files
-nnoremap <Leader>u :so ~/.vimrc<CR>
+nnoremap <Leader>u :so ~/.vim/vimrc<CR>
 nnoremap <Leader>s :so %<CR>
 
 " Edit files
-nnoremap <Leader>v :e ~/.vimrc<CR>
-nnoremap <Leader>V :sp ~/.vimrc<CR>
+nnoremap <Leader>v :e ~/.vim/vimrc<CR>
+nnoremap <Leader>V :sp ~/.vim/vimrc<CR>
 
 " Search 
 nnoremap <Leader>* /\<\><Left><Left>
@@ -140,7 +134,7 @@ nnoremap con :set number!<CR>
 nnoremap cul :set cul!<CR>
 nnoremap cuc :set cuc!<CR>
 
-nnoremap \<SPACE> :nohlsearch<CR>
+nnoremap <LocalLeader><SPACE> :nohlsearch<CR>
 vnoremap $ g_
 nnoremap <Leader>cd :cd %:p:h<CR>
 nnoremap <Leader>bg :let &background = ( &background == "dark"? "light" : "dark" )<CR>
@@ -167,7 +161,7 @@ cnoremap <C-A> <HOME>
 cnoremap <C-E> <END>
 
 " Navigation {{{2
-nnoremap <LocalLeader>e :Explore<CR>
+nnoremap <Leader>e :Explore<CR>
  
 " Jump to definition and open it in vertical split 
 nnoremap <silent> <Leader>T :let word=expand("<cword>")<CR>:vertical topleft split<CR>:wincmd w<cr>:exec("tag ". word)<CR>
@@ -215,34 +209,11 @@ nnoremap Y y$
 nnoremap Q :q<CR>
 
 
-" Statusline {{{1
-hi default link User1 Error
-set statusline =
-set statusline +=[%n]                                    " buffer number
-set statusline +=\ %f                                    " Full path to file
-set statusline +=\ %1*%m%0*                              " modified flag
-" virtualenv
-" set statusline +=%(\ %#StatusLineEnv#%{virtualenv#statusline()}%*%)
-" tagbar
-" set statusline +=\ %=%-20.30{tagbar#currenttag('%s','')} " Current function
-" syntastic
-set statusline+=%#warningmsg#
-" set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-"
-set statusline +=\ %h                                    " [help]
-set statusline +=%r                                      " read only flag
-set statusline +=%w                                      " preview window flag
-set statusline +=%=%-14.(%l,%c%V%)                       " Line, column-virtual column"
-set statusline +=%=lines:\ %-5L                          " Lines in the buffer
-
-
 " Options {{{1
 set ttyfast
 set hlsearch
 set vb t_vb=
 set splitright
-" set autowrite
 set shiftwidth=4
 set hidden
 set expandtab
@@ -253,15 +224,16 @@ set guicursor+=n-v-c:blinkon0
 set history=100
 set virtualedit=block
 set grepprg=git\ grep\ -n\ $*
-set number
 " set grepprg=ag\ --nogroup\ --nocolor
+set number
 
 " Adapt the background to the current time
-if strftime("%H") > 8 && strftime("%H") < 17
-    set background=light
-else
-    set background=dark
-endif
+" if strftime("%H") > 8 && strftime("%H") < 17
+"     set background=light
+" else
+"     set background=dark
+" endif
+set background=dark
 
 " Folds
 set nofoldenable
@@ -284,20 +256,25 @@ endif
 
 
 " Tags {{{2
-set tagstack          
+set tagstack
 set tags=./tags,tags,.git/tags
 
 " GUI {{{2
 if has('gui_running')
     set guioptions=g
-    " set guifont=Cousine:h14
-    " set linespace=5
-    set guifont=Menlo\ Regular:h15
-    " set guifont=Monoid:h15
-    set linespace=9
+    " set guifont=Menlo:h17
+    set guifont=Inconsolata:h22
+    set linespace=6
 else
     set t_Co=256
 endif
+
+" Statusline  {{{2
+set statusline=
+set statusline+=%-20.20(%f\ %m%)
+set statusline+=%{fugitive#statusline()}
+set statusline+=%=
+set statusline+=%-14.(%c%V%)
 
 
 " Functions {{{1
@@ -357,17 +334,23 @@ command! -bar -range Source silent <line1>,<line2>yank z | let @z = substitute(@
 " Plugins {{{1
 call plug#begin('~/.vim/bundle')
 
-Plug 'TaurusOlson/darkburn.vim'
-Plug 'reedes/vim-colors-pencil'
+" Use GitHub username if local source dir isn't set
+" (https://github.com/noahfrederick/dots/blob/master/vim/vimrc)
+let $PLUG_SRC = exists('$PROJECTS') ? $PROJECTS : 'TaurusOlson'
+
+Plug '$PLUG_SRC/darkburn.vim'
+Plug '$PLUG_SRC/hornet.vim'
+Plug '$PLUG_SRC/graffik.vim'
+Plug '$PLUG_SRC/creature.vim'
 Plug 'altercation/vim-colors-solarized'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sensible'
 Plug 'morhetz/gruvbox'
-Plug 'TaurusOlson/graffik.vim'
-Plug 'git@github.com:TaurusOlson/creature.vim.git'
 Plug 'w0ng/vim-hybrid'
+Plug 'zenorocha/dracula-theme', {'rtp': 'vim/'}
+Plug 'sjl/badwolf'
 Plug 'whatyouhide/vim-gotham'
 Plug 'vim-scripts/plum.vim'
 
@@ -399,6 +382,10 @@ autocmd BufReadPost fugitive://* set bufhidden=delete
 autocmd FileType gitcommit setlocal cursorline
 
 
+" " tpope/vim-dispatch {{{2
+Plug 'tpope/vim-dispatch'
+
+
 " SirVer/ultisnips {{{2
 Plug 'SirVer/ultisnips'
 let g:UltiSnipsExpandTrigger="<tab>"
@@ -418,25 +405,6 @@ let g:SuperTabContextDiscoverDiscovery =
 let g:SuperTabDefaultCompletionType = "context"
 
 
-" vimwiki/vimwiki {{{2
-Plug 'vimwiki/vimwiki'
-let g:vimwiki_fold_lists = 1
-let mywiki = {}
-let mywiki.path = '~/Dropbox/Blogs/vimwiki/'
-let mywiki.path_html = '~/Dropbox/Blogs/vimwiki_html/'
-let mywiki.template_path = '~/Dropbox/Blogs/vimwiki/templates/'
-let mywiki.template_default = 'def_template'
-let mywiki.template_ext = '.html'
-let mywiki.css_name = 'main.css'
-" let mywiki.css_name = 'dark.css'
-let mywiki.syntax = 'markdown'
-let mywiki.ext = '.md'
-let g:vimwiki_list = [mywiki]
-let g:vimwiki_ext2syntax = {'.md': 'markdown', '.wiki': 'media'}
-let g:vimwiki_hl_headers = 1
-let g:vimwiki_folding = 'syntax'
-
-
 " " vim-scripts/Notes {{{2
 " Plug 'vim-scripts/Notes'
 " let g:notesRoot='~/Dropbox/Blogs/vimwiki/'
@@ -454,40 +422,10 @@ let g:tagbar_autopreview = 0
 let g:tagbar_iconchars = ['▸','▾']
 
 
-" " szw/vim-ctrlspace {{{2
-" Plug 'szw/vim-ctrlspace', {'on': 'CtrlSpace'}
-" let g:ctrlspace_default_mapping_key = "<Leader><Space>"
-" hi CtrlSpaceNormal guifg=fg guibg=bg
-" hi CtrlSpaceSelected guifg=bg guibg=fg gui=none
-" hi CtrlSpaceFound guifg=red guibg=NONE gui=none
-
-
-" " Processing {{{2
-Plug 'goonzoid/vim-reprocessed'
-autocmd BufRead,BufEnter *.pde nnoremap <buffer> ;s :split $PROJECTS/Processing/snippets<CR>
-
-" Run procesing from the command line
-function! RunProcessing()
-     let s:fullpath  = expand("%:p:h")
-     let s:splitpath = split(s:fullpath, '/')
-     let s:processing_project = s:splitpath[-1]
-     echo "Launching " .s:processing_project
-     execute "silent !processing-java --output=/tmp/sketches/" .s:processing_project. "  --sketch=" .s:fullpath.  " --force --run &"
-endfunction
-
-command! -nargs=0 RunProcessing :call RunProcessing()
-
-
 " rking/ag.vim {{{2
 Plug 'rking/ag.vim', {'on': 'Ag'}
 nnoremap <Leader>a :Ag!<SPACE><c-r>=expand('<cword>')<CR><CR>
 nnoremap <Leader>A :Ag<SPACE>
-
-
-" gregsexton/gitv {{{2
-Plug 'gregsexton/gitv', {'on': 'Gitv'}
-nnoremap gv :Gitv<CR>
-nnoremap gV :Gitv!<CR>
 
 
 " plasticboy/vim-markdown {{{2
@@ -513,19 +451,8 @@ vnoremap =a,       :Tabularize  /,<CR>
 Plug 'wellle/targets.vim'
 
 
-" " gerw/vim-latex-suite {{{2
-" Plug 'gerw/vim-latex-suite'
-
-
-" jmcantrell/vim-virtualenv {{{2
-Plug 'jmcantrell/vim-virtualenv'
-let g:virtualenv_stl_format = '[%n]'
-
-
 " mattn/emmet-vim {{{2
 Plug 'mattn/emmet-vim'
-"{ 'for': 'html'}
-" let g:user_emmet_leader_key = '<c-z>'
 
 
 " vim-scripts/Vim-R-plugin {{{2
@@ -545,23 +472,10 @@ let g:jekyll_path = "~/Blog/taurusolson.github.com"
 Plug 'jeffkreeftmeijer/vim-numbertoggle'
 
 
-" christoomey/vim-tmux-runner {{{2
-" Plug 'christoomey/vim-tmux-runner'
-
-
-" " christoomey/vim-tmux-navigator {{{2
-" Plug 'christoomey/vim-tmux-navigator'
-" nnoremap <silent> {Left-mapping} :TmuxNavigateLeft<cr>
-" nnoremap <silent> {Down-Mapping} :TmuxNavigateDown<cr>
-" nnoremap <silent> {Up-Mapping} :TmuxNavigateUp<cr>
-" nnoremap <silent> {Right-Mapping} :TmuxNavigateRight<cr>
-" nnoremap <silent> {Previous-Mapping} :TmuxNavigatePrevious<cr>
-
-
 " itchyny/lightline.vim {{{2
 Plug 'itchyny/lightline.vim'
 let g:lightline = { 
-            \ 'colorscheme': 'wombat',
+            \ 'colorscheme': 'Tomorrow',
             \ 'separator': { 'left': '⮀', 'right': '⮂' },
             \ 'subseparator': { 'left': '⮁', 'right': '⮃' }
             \ }
@@ -599,9 +513,9 @@ let g:lightline.component_type = {
 "     call lightline#update()
 " endfunction
 
-" let g:lightline.tab = {
-"             \ 'active': [ 'tabnum', 'filename', 'modified' ],
-"             \ 'inactive': [ 'tabnum', 'filename', 'modified' ] }
+let g:lightline.tab = {
+            \ 'active': [ 'tabnum', 'filename', 'modified' ],
+            \ 'inactive': [ 'tabnum', 'filename', 'modified' ] }
 
 augroup LightLineColorscheme
     autocmd!
@@ -613,7 +527,7 @@ function! s:lightline_update()
         return
     endif
     try
-        if g:colors_name =~# 'wombat\|solarized\|landscape\|jellybeans\|Tomorrow'
+        if g:colors_name =~# 'wombat\|solarized\|landscape\|jellybeans\|Tomorrow\|gotham'
             let g:lightline.colorscheme =
                         \ substitute(substitute(g:colors_name, '-', '_', 'g'), '256.*', '', '') .
                         \ (g:colors_name ==# 'solarized' ? '_' . &background : '')
@@ -643,50 +557,17 @@ Plug 'mbbill/undotree'
 nnoremap <LocalLeader>g :UndotreeToggle<CR>
 
 
-" " tpope/vim-vinegar {{{2
-" Plug 'tpope/vim-vinegar'
-" nmap ;v <Plug>VinegarVerticalSplitUp
-" nmap ;s <Plug>VinegarSplitUp
-
-
 " Raimondi/delimitMate {{{2
 Plug 'Raimondi/delimitMate'
+let delimitMate_expand_cr = 1
 
-
-" Clojure plugins {{{2
-Plug 'guns/vim-clojure-static', { 'for': 'clojure' }
-Plug 'guns/vim-sexp', { 'for': 'clojure' }
-nmap <Leader>F <Plug>FireplacePrint<Plug>(sexp_outer_top_list), { 'for': 'clojure' }
-nmap <Leader>f <Plug>FireplacePrint<Plug>(sexp_outer_list), { 'for': 'clojure' }
-nmap <Leader>e <Plug>FireplacePrint<Plug>(sexp_inner_element), { 'for': 'clojure' }
-
-Plug 'tpope/vim-leiningen', { 'for': 'clojure' }
-Plug 'tpope/vim-fireplace', { 'for': 'clojure' }
-Plug 'tpope/vim-classpath', { 'for': 'clojure' }
-Plug 'tpope/vim-projectionist'
-Plug 'tpope/vim-dispatch'
-
-
-" luochen1990/rainbow
+" luochen1990/rainbow {{{2
 Plug 'luochen1990/rainbow', { 'for': 'clojure' }
 let g:rainbow_active = 1
 
 
 " matze/vim-tex-fold {{{2
 Plug 'matze/vim-tex-fold', { 'for': 'tex' }
-
-
-" " scrooloose/syntastic {{{2
-" Plug 'scrooloose/syntastic'
-" let g:syntastic_always_populate_loc_list = 1
-" let g:syntastic_auto_loc_list = 0
-" let g:syntastic_check_on_open = 0
-" let g:syntastic_check_on_wq = 0
-" let g:syntastic_stl_format = '[%E{Err: %fe #%e}%B{, }%W{Warn: %fw #%w}]'
-
-
-" venantius/vim-eastwood {{{2
-Plug 'venantius/vim-eastwood', {'for': 'clojure'}
 
 
 " vim-pandoc/vim-pandoc {{{2
@@ -709,8 +590,148 @@ Plug 'airblade/vim-gitgutter'
 Plug 'ap/vim-css-color'
 
 
-" lambdalisue/vim-gita {{{2
-Plug 'lambdalisue/vim-gita'
+" vim-scripts/jcommenter.vim {{{2
+Plug 'vim-scripts/jcommenter.vim', {'for': 'java'}
 
+autocmd FileType java let b:jcommenter_class_author='Taurus Olson (taurusolson@gmail.com)'
+autocmd FileType java let b:jcommenter_file_author='Taurus Olson (taurusolson@gmail.com)'
+autocmd FileType java source ~/.vim/bundle/jcommenter.vim/plugin/jcommenter.vim
+autocmd FileType java map gm :call JCommentWriter()<CR>
+" autocmd Filetype java set makeprg=javac\ %
+autocmd Filetype java command! Java execute "! basename % .java | xargs java"
+
+
+" cakebaker/scss-syntax.vim {{{2
+Plug 'cakebaker/scss-syntax.vim', {'for': 'scss'}
+
+
+" " fboender/bexec {{{2
+" Plug 'fboender/bexec'
+" let g:bexec_filter_types = {'python': 'python '}
+
+
+" christoomey/vim-tmux-navigator {{{2
+Plug 'christoomey/vim-tmux-navigator'
+nnoremap <silent> <C-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <C-l> :TmuxNavigateRight<cr>
+
+
+" " joonty/vim-do {{{2
+" Plug 'joonty/vim-do'
+" let g:do_new_buffer_size=1000
+
+
+" " rizzatti/dash.vim {{{2
+" Plug 'rizzatti/dash.vim'
+
+
+" junegunn/gv.vim {{{2
+Plug 'junegunn/gv.vim', {'on': 'GV'}
+nnoremap gv :GV<CR>
+nnoremap gV :GV!<CR>
+
+
+" chriskempson/vim-tomorrow-theme {{{2
+Plug 'chriskempson/vim-tomorrow-theme'
+
+
+" " tweekmonster/braceless.vim {{{2
+" Plug 'tweekmonster/braceless.vim'
+" autocmd FileType python,coffee BracelessEnable +indent
+" let g:braceless_enable_easymotion = 0
+
+
+" kristijanhusak/vim-hybrid-material {{{2
+Plug 'kristijanhusak/vim-hybrid-material'
+let g:enable_bold_font = 0
+
+
+" tpope/vim-projectionist {{{2
+Plug 'tpope/vim-projectionist'
+
+
+" vim-latex/vim-latex {{{2
+Plug 'vim-latex/vim-latex'
+nmap <C-=> <Plug>IMAP_JumpForward
+imap <C-j> <Plug>IMAP_JumpForward
+
+
+" fmoralesc/molokayo {{{2
+Plug 'fmoralesc/molokayo'
+
+
+" scrooloose/nerdtree {{{2
+Plug 'scrooloose/nerdtree', {'on': 'NERDTreeCWD'}
+nnoremap <leader>n :NERDTreeCWD<CR>
+let NERDTreeHijackNetrw = 0
+
+
+" aperezdc/vim-template {{{2
+Plug 'aperezdc/vim-template'
+let g:username=$GITHUB_USER_NAME
+let g:email=$GITHUB_USER_EMAIL
+
+
+" " Valloric/YouCompleteMe {{{2
+" Plug 'Valloric/YouCompleteMe'
+" let g:ycm_confirm_extra_conf = 0
+" let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+" let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+
+
+"  fatih/vim-go {{{2
+Plug 'fatih/vim-go'
+let g:go_auto_type_info = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_interfaces = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_build_constraints = 1
+au FileType go nmap <buffer> <LocalLeader>r <Plug>(go-run)
+au FileType go nmap <buffer> <LocalLeader>b <Plug>(go-build)
+au FileType go nmap <buffer> <LocalLeader>t <Plug>(go-test)
+au FileType go nmap <buffer> <LocalLeader>c <Plug>(go-coverage)
+au FileType go nmap <buffer> <LocalLeader>ds <Plug>(go-def-split)
+au FileType go nmap <buffer> <LocalLeader>dv <Plug>(go-def-vertical)
+au FileType go nmap <buffer> <LocalLeader>dt <Plug>(go-def-tab)
+au FileType go nmap <buffer> <LocalLeader>gd <Plug>(go-doc)
+au FileType go nmap <buffer> <LocalLeader>gv <Plug>(go-doc-vertical)
+au FileType go nmap <buffer> <LocalLeader>i <Plug>(go-info)
+au FileType go nmap <buffer> <LocalLeader>e <Plug>(go-rename)
+au FileType go nmap <buffer> <LocalLeader>gb <Plug>(go-doc-browser)
+
+
+" junegunn/goyo.vim {{{2
+Plug 'junegunn/goyo.vim'
+
+
+" jmcantrell/vim-virtualenv {{{2
+Plug 'jmcantrell/vim-virtualenv'
+
+
+" " vim-ctrlspace/vim-ctrlspace {{{2
+" Plug 'vim-ctrlspace/vim-ctrlspace'
+" let g:CtrlSpaceSearchTiming = 500
+" hi link CtrlSpaceNormal   PMenu
+" hi link CtrlSpaceSelected PMenuSel
+" hi link CtrlSpaceSearch   Search
+" hi link CtrlSpaceStatus   StatusLine
+" hi link CtrlSpaceSearch IncSearch
+" if executable("ag")
+"     let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
+" endif
+
+
+" Shougo/vimshell.vim {{{2
+Plug 'Shougo/vimshell.vim'
+
+" Shougo/vimproc.vim {{{2
+Plug 'Shougo/vimproc.vim'
 
 call plug#end()
+
+" colorscheme Tomorrow-Night
+colorscheme hybrid_material
