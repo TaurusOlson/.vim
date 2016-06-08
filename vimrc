@@ -14,6 +14,9 @@ augroup vimrc_group
     " cd into the current directory
     " autocmd BufEnter * if strpart(expand("%:h"), 0, 8) !=# 'fugitive' | silent cd %:p:h
     " autocmd BufEnter * if expand("%") !=# "~/.vimrc" | silent cd %:p:h
+
+    " cd into the root of the source code repo
+    autocmd BufEnter * exe 'RepoRoot '.expand('%')
     autocmd Filetype crontab  setlocal nobackup nowritebackup
 
     " Resize splits when the window is resized
@@ -481,7 +484,7 @@ let g:lightline = {
             \ }
 
 let g:lightline.active = {
-            \ 'left': [['mode', 'paste', 'modified'], ['filename', 'fugitive', 'syntastic']],
+            \ 'left': [['mode', 'paste', 'modified'], ['filename', 'fugitive', 'virtualenv', 'syntastic']],
             \ 'right': [['tagbar', 'lineinfo']],
             \ }
 
@@ -493,6 +496,7 @@ let g:lightline.inactive = {
 let g:lightline.component_function = {
             \ 'fugitive': 'MyFugitive',
             \ 'tagbar': 'MyTagBar',
+            \ 'virtualenv': 'MyVirtualEnv',
             \ }
 
 let g:lightline.component_expand = {
@@ -549,6 +553,13 @@ endfunction
 
 function! MyTagBar()
     return tagbar#currenttag('%s','')
+endfunction
+
+function! MyVirtualEnv()
+    if &ft == 'python'
+        return virtualenv#statusline()
+    endif
+    return ''
 endfunction
 
 
@@ -712,6 +723,10 @@ Plug 'junegunn/goyo.vim'
 Plug 'jmcantrell/vim-virtualenv'
 
 
+" jmcantrell/vim-reporoot {{{2
+Plug 'jmcantrell/vim-reporoot' 
+
+
 " " vim-ctrlspace/vim-ctrlspace {{{2
 " Plug 'vim-ctrlspace/vim-ctrlspace'
 " let g:CtrlSpaceSearchTiming = 500
@@ -727,6 +742,7 @@ Plug 'jmcantrell/vim-virtualenv'
 
 " Shougo/vimshell.vim {{{2
 Plug 'Shougo/vimshell.vim'
+
 
 " Shougo/vimproc.vim {{{2
 Plug 'Shougo/vimproc.vim'
