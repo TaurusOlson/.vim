@@ -26,7 +26,7 @@ augroup vimrc_group
     autocmd FocusLost * :silent! wall
 
     " Fold method is fold marker for any filetype
-    autocmd Filetype vim,python,r setlocal fdm=marker
+    autocmd Filetype vim,r setlocal fdm=marker
 
     " Prevent auto comment prefixing
     autocmd FileType * setlocal formatoptions-=r formatoptions-=o
@@ -346,13 +346,9 @@ Plug '$PLUG_SRC/hornet.vim'
 Plug '$PLUG_SRC/graffik.vim'
 Plug '$PLUG_SRC/creature.vim'
 Plug 'altercation/vim-colors-solarized'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-sensible'
 Plug 'morhetz/gruvbox'
 Plug 'w0ng/vim-hybrid'
-Plug 'zenorocha/dracula-theme', {'rtp': 'vim/'}
+Plug 'dracula/vim'
 Plug 'sjl/badwolf'
 Plug 'whatyouhide/vim-gotham'
 Plug 'vim-scripts/plum.vim'
@@ -366,6 +362,7 @@ let g:ctrlp_cmd = 'CtrlP'
 " map <D-t> :CtrlP<CR>
 map <D-b> :CtrlPBuffer<CR>
 map <D-g> :CtrlPBufTag<CR>
+map <D-t> :CtrlPTag<CR>
 map <D-r> :CtrlPCurFile<CR>
 nnoremap <D-u> :CtrlPMRU<CR>
 nnoremap <D-s> :CtrlP ~/.vim/bundle<CR>
@@ -385,7 +382,23 @@ autocmd BufReadPost fugitive://* set bufhidden=delete
 autocmd FileType gitcommit setlocal cursorline
 
 
-" " tpope/vim-dispatch {{{2
+" tpope/vim-surround {{{2
+Plug 'tpope/vim-surround'
+
+
+" tpope/vim-commentary {{{2
+Plug 'tpope/vim-commentary'
+
+
+" tpope/vim-repeat {{{2
+Plug 'tpope/vim-repeat'
+
+
+" tpope/vim-sensible {{{2
+Plug 'tpope/vim-sensible'
+
+
+" tpope/vim-dispatch {{{2
 Plug 'tpope/vim-dispatch'
 
 
@@ -572,6 +585,7 @@ nnoremap <LocalLeader>g :UndotreeToggle<CR>
 Plug 'Raimondi/delimitMate'
 let delimitMate_expand_cr = 1
 
+
 " luochen1990/rainbow {{{2
 Plug 'luochen1990/rainbow', { 'for': 'clojure' }
 let g:rainbow_active = 1
@@ -582,19 +596,19 @@ Plug 'matze/vim-tex-fold', { 'for': 'tex' }
 
 
 " vim-pandoc/vim-pandoc {{{2
-Plug 'vim-pandoc/vim-pandoc'
+" Plug 'vim-pandoc/vim-pandoc'
 
 
 " vim-pandoc/vim-pandoc-syntax
-Plug 'vim-pandoc/vim-pandoc-syntax'
+" Plug 'vim-pandoc/vim-pandoc-syntax'
 
 
 " vim-pandoc/vim-rmarkdown {{{2
-Plug 'vim-pandoc/vim-rmarkdown', {'for': 'rmarkdown'}
+" Plug 'vim-pandoc/vim-rmarkdown', {'for': 'rmarkdown'}
 
 
 " airblade/vim-gitgutter {{{2
-Plug 'airblade/vim-gitgutter'
+Plug 'airblade/vim-gitgutter', {'on': 'GitGutterEnable'}
 
 
 " ap/vim-css-color {{{2
@@ -603,7 +617,6 @@ Plug 'ap/vim-css-color'
 
 " vim-scripts/jcommenter.vim {{{2
 Plug 'vim-scripts/jcommenter.vim', {'for': 'java'}
-
 autocmd FileType java let b:jcommenter_class_author='Taurus Olson (taurusolson@gmail.com)'
 autocmd FileType java let b:jcommenter_file_author='Taurus Olson (taurusolson@gmail.com)'
 autocmd FileType java source ~/.vim/bundle/jcommenter.vim/plugin/jcommenter.vim
@@ -646,12 +659,6 @@ nnoremap gV :GV!<CR>
 
 " chriskempson/vim-tomorrow-theme {{{2
 Plug 'chriskempson/vim-tomorrow-theme'
-
-
-" " tweekmonster/braceless.vim {{{2
-" Plug 'tweekmonster/braceless.vim'
-" autocmd FileType python,coffee BracelessEnable +indent
-" let g:braceless_enable_easymotion = 0
 
 
 " kristijanhusak/vim-hybrid-material {{{2
@@ -716,7 +723,7 @@ au FileType go nmap <buffer> <LocalLeader>gb <Plug>(go-doc-browser)
 
 
 " junegunn/goyo.vim {{{2
-Plug 'junegunn/goyo.vim'
+Plug 'junegunn/goyo.vim', {'on': 'Goyo'}
 
 
 " jmcantrell/vim-virtualenv {{{2
@@ -746,6 +753,25 @@ Plug 'Shougo/vimshell.vim'
 
 " Shougo/vimproc.vim {{{2
 Plug 'Shougo/vimproc.vim'
+
+
+" tweekmonster/django-plus.vim {{{2
+Plug 'tweekmonster/django-plus.vim'
+ 
+
+" tweekmonster/braceless.vim {{{2
+Plug 'tweekmonster/braceless.vim'
+" autocmd FileType python nnoremap <space> :<C-u>call braceless#fold#close(line('.'), 0)<cr>
+" let g:braceless_enable_easymotion = 0
+" autocmd FileType python,coffee BracelessEnable +indent
+autocmd FileType python BracelessEnable +fold
+autocmd FileType python BracelessEnable +indent
+
+
+" mhinz/vim-grepper {{{2
+Plug 'mhinz/vim-grepper'
+nmap gr <plug>(GrepperOperator)
+xmap gr <plug>(GrepperOperator)
 
 call plug#end()
 
