@@ -399,7 +399,7 @@ Plug 'tpope/vim-sensible'
 
 
 " tpope/vim-dispatch {{{2
-Plug 'tpope/vim-dispatch'
+" Plug 'tpope/vim-dispatch'
 
 
 " SirVer/ultisnips {{{2
@@ -445,7 +445,7 @@ nnoremap <Leader>A :Ag<SPACE>
 
 
 " plasticboy/vim-markdown {{{2
-Plug 'plasticboy/vim-markdown'
+Plug 'plasticboy/vim-markdown', {'for': 'markdown'}
 let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_initial_foldlevel=0
 autocmd BufEnter *.html.pmd setlocal ft=markdown
@@ -761,9 +761,6 @@ Plug 'tweekmonster/django-plus.vim'
 
 " tweekmonster/braceless.vim {{{2
 Plug 'tweekmonster/braceless.vim'
-" autocmd FileType python nnoremap <space> :<C-u>call braceless#fold#close(line('.'), 0)<cr>
-" let g:braceless_enable_easymotion = 0
-" autocmd FileType python,coffee BracelessEnable +indent
 autocmd FileType python BracelessEnable +fold
 autocmd FileType python BracelessEnable +indent
 
@@ -772,6 +769,7 @@ autocmd FileType python BracelessEnable +indent
 Plug 'mhinz/vim-grepper'
 nmap gr <plug>(GrepperOperator)
 xmap gr <plug>(GrepperOperator)
+
 
 call plug#end()
 
