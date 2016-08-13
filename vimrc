@@ -35,7 +35,7 @@ augroup vimrc_group
     autocmd FileType netrw nmap <buffer> <backspace> -
 
     " Open vim help for word under cursor
-    autocmd Filetype vim,help nnoremap <silent> K :let word=expand("<cword>")<CR>:exec("help ". word)<CR>
+    autocmd Filetype vim,help nnoremap <buffer> <silent> K :let word=expand("<cword>")<CR>:exec("help ". word)<CR>
 
     " Execute the current line
     autocmd FileType vim nnoremap <Leader>S ^vg_y:execute @@<CR>
@@ -257,6 +257,7 @@ if !isdirectory(expand(&directory))
     call mkdir(expand(&directory), "p")
 endif
 
+set encoding=utf-8
 
 " Tags {{{2
 set tagstack
@@ -266,7 +267,8 @@ set tags=./tags,tags,.git/tags
 if has('gui_running')
     set guioptions=g
     " set guifont=Menlo:h17
-    set guifont=Inconsolata:h22
+    " set guifont=Inconsolata:h20
+    set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Nerd\ Font\ Complete:h18
     set linespace=6
 else
     set t_Co=256
@@ -359,13 +361,12 @@ Plug 'ctrlpvim/ctrlp.vim'
 let g:ctrlp_buftag_ctags_bin = '/usr/local/bin/ctags'
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
-" map <D-t> :CtrlP<CR>
 map <D-b> :CtrlPBuffer<CR>
 map <D-g> :CtrlPBufTag<CR>
 map <D-t> :CtrlPTag<CR>
-map <D-r> :CtrlPCurFile<CR>
+map <D-s> :CtrlPCurFile<CR>
 nnoremap <D-u> :CtrlPMRU<CR>
-nnoremap <D-s> :CtrlP ~/.vim/bundle<CR>
+nnoremap <D-r> :CtrlPRoot<CR>
 nnoremap <LocalLeader>a :CtrlPBookmarkDirAdd .<CR>
 let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 
@@ -468,11 +469,11 @@ Plug 'wellle/targets.vim'
 
 
 " mattn/emmet-vim {{{2
-Plug 'mattn/emmet-vim'
+Plug 'mattn/emmet-vim', {'for': ['html', 'htmldjango']}
 
 
 " vim-scripts/Vim-R-plugin {{{2
-Plug 'jcfaria/Vim-R-plugin'
+Plug 'jcfaria/Vim-R-plugin', {'for': 'r'}
 " Lines added by the Vim-R-plugin command :RpluginConfig (2014-Sep-24 00:10):
 " Press the space bar to send lines (in Normal mode) and selections to R:
 autocmd FileType r vmap <buffer> <Space> <Plug>RDSendSelection
@@ -497,7 +498,8 @@ let g:lightline = {
             \ }
 
 let g:lightline.active = {
-            \ 'left': [['mode', 'paste', 'modified'], ['filename', 'fugitive', 'virtualenv', 'syntastic']],
+            \ 'left': [['mode', 'paste', 'modified'],
+            \ ['filename', 'fugitive', 'virtualenv', 'syntastic']],
             \ 'right': [['tagbar', 'lineinfo']],
             \ }
 
@@ -577,7 +579,7 @@ endfunction
 
 
 " mbbill/undotree {{{2
-Plug 'mbbill/undotree'
+Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
 nnoremap <LocalLeader>g :UndotreeToggle<CR>
 
 
@@ -608,7 +610,7 @@ Plug 'matze/vim-tex-fold', { 'for': 'tex' }
 
 
 " airblade/vim-gitgutter {{{2
-Plug 'airblade/vim-gitgutter', {'on': 'GitGutterEnable'}
+Plug 'airblade/vim-gitgutter'
 
 
 " ap/vim-css-color {{{2
@@ -626,7 +628,7 @@ autocmd Filetype java command! Java execute "! basename % .java | xargs java"
 
 
 " cakebaker/scss-syntax.vim {{{2
-Plug 'cakebaker/scss-syntax.vim', {'for': 'scss'}
+" Plug 'cakebaker/scss-syntax.vim', {'for': 'scss'}
 
 
 " " fboender/bexec {{{2
@@ -634,21 +636,17 @@ Plug 'cakebaker/scss-syntax.vim', {'for': 'scss'}
 " let g:bexec_filter_types = {'python': 'python '}
 
 
-" christoomey/vim-tmux-navigator {{{2
-Plug 'christoomey/vim-tmux-navigator'
-nnoremap <silent> <C-h> :TmuxNavigateLeft<cr>
-nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
-nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
-nnoremap <silent> <C-l> :TmuxNavigateRight<cr>
+" " christoomey/vim-tmux-navigator {{{2
+" Plug 'christoomey/vim-tmux-navigator'
+" nnoremap <silent> <C-h> :TmuxNavigateLeft<cr>
+" nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
+" nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
+" nnoremap <silent> <C-l> :TmuxNavigateRight<cr>
 
 
 " " joonty/vim-do {{{2
 " Plug 'joonty/vim-do'
 " let g:do_new_buffer_size=1000
-
-
-" " rizzatti/dash.vim {{{2
-" Plug 'rizzatti/dash.vim'
 
 
 " junegunn/gv.vim {{{2
@@ -676,10 +674,6 @@ nmap <C-=> <Plug>IMAP_JumpForward
 imap <C-j> <Plug>IMAP_JumpForward
 
 
-" fmoralesc/molokayo {{{2
-Plug 'fmoralesc/molokayo'
-
-
 " scrooloose/nerdtree {{{2
 Plug 'scrooloose/nerdtree', {'on': 'NERDTreeCWD'}
 nnoremap <leader>n :NERDTreeCWD<CR>
@@ -700,7 +694,7 @@ let g:email=$GITHUB_USER_EMAIL
 
 
 "  fatih/vim-go {{{2
-Plug 'fatih/vim-go'
+Plug 'fatih/vim-go', {'for': 'go'}
 let g:go_auto_type_info = 1
 let g:go_highlight_functions = 1
 let g:go_highlight_methods = 1
@@ -748,11 +742,11 @@ Plug 'jmcantrell/vim-reporoot'
 
 
 " Shougo/vimshell.vim {{{2
-Plug 'Shougo/vimshell.vim'
+" Plug 'Shougo/vimshell.vim'
 
 
 " Shougo/vimproc.vim {{{2
-Plug 'Shougo/vimproc.vim'
+" Plug 'Shougo/vimproc.vim'
 
 
 " tweekmonster/django-plus.vim {{{2
@@ -771,7 +765,66 @@ nmap gr <plug>(GrepperOperator)
 xmap gr <plug>(GrepperOperator)
 
 
+" vim-scripts/project.tar.gz {{{2
+Plug 'vim-scripts/project.tar.gz', {'on': 'Project'}
+nnoremap <leader>p :Project<CR>
+
+
+" rakr/vim-two-firewatch {{{2
+Plug 'rakr/vim-two-firewatch'
+
+
+" sloria/vim-ped {{{2
+Plug 'sloria/vim-ped', {'for': 'python'}
+autocmd Filetype python nmap <buffer> K <Plug>PedCwordExec
+autocmd Filetype python vmap <buffer> K <Plug>PedVwordExec
+
+
+" mhinz/vim-startify {{{2
+Plug 'mhinz/vim-startify'
+let g:startify_bookmarks = [{'o': '~/Dropbox/Projects/olson2/olson/manage.py'},
+            \ {'f': '~/Dropbox/Projects/fntools/fntools/fntools.py'},
+            \ {'s': '~/Dropbox/Projects/savage/svg.py'},
+            \ {'t': '~/Dropbox/Projects/time-machine/timemachine/app.py'},
+            \ {'g': '~/Dropbox/Projects/django-git/git/models.py'},
+            \ {'c': '~/Dropbox/Projects/contemplation/contemplation.py'}]
+let g:ascii = [
+            \ '                     __',
+            \ '             .--.--.|__|.--------.',
+            \ '             |  |  ||  ||        |',
+            \ '              \___/ |__||__|__|__|',
+            \ ''
+            \]
+
+let g:ascii = [ '   Welcome ' . $USER ]
+
+let g:startify_custom_header = g:ascii
+let g:startify_list_order = [
+        \ ['   Projects:'],
+        \ 'bookmarks',
+        \ ['   MRU files:'],
+        \ 'files',
+        \ ['   Sessions:'],
+        \ 'sessions',
+        \ ]
+let g:startify_enable_special = 0
+let g:startify_change_to_dir = 1
+autocmd User Startified let &l:stl = '   Current time: ' . strftime('%H:%M')
+
+
+" chrisbra/csv.vim {{{2
+Plug 'chrisbra/csv.vim', {'for': 'csv'}
+
+
+" nvie/vim-flake8 {{{2
+Plug 'nvie/vim-flake8', {'for': 'python'}
+" autocmd BufWritePost **/*.py call Flake8()
+
+
+" AndrewRadev/bufferize.vim {{{2
+Plug 'AndrewRadev/bufferize.vim', {'on': 'Bufferize'}
+
+
 call plug#end()
 
-" colorscheme Tomorrow-Night
-colorscheme hybrid_material
+colorscheme two-firewatch
