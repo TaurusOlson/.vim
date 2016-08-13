@@ -5,3 +5,4 @@ view
 bundle
 sessions
 focus
+autoload/plug.vim.old
