@@ -1,6 +1,6 @@
 " Taurus Olson's vim configuration file
 
-" set nocompatible 
+" set nocompatible
 
 syntax on
 filetype plugin indent on
@@ -42,7 +42,7 @@ augroup vimrc_group
 
     " PYTHON
     autocmd FileType python setlocal softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
-    autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+    " autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 
     " PROCESSING
     autocmd FileType reprocessed setlocal fdm=syntax sw=2 ts=2 textwidth=79 commentstring=//\ %s
@@ -93,7 +93,7 @@ augroup END
 
 
 " HTML {{{1
-let g:html_indent_inctags = "html,body,head,tbody" 
+let g:html_indent_inctags = "html,body,head,tbody"
 
 
 " Mappings {{{1
@@ -101,6 +101,10 @@ let mapleader = ","
 let maplocalleader = "\\"
 inoremap kj <ESC>
 nnoremap <C-SPACE> :w<CR>
+
+" For some reason <C-^> doesn't work on my Linux machine
+nnoremap ² :e #<CR>
+nnoremap œ :e #<CR>
 
 " Paste (by sheerun)
 vnoremap <silent> y y`]
@@ -124,7 +128,7 @@ nnoremap <Leader>s :so %<CR>
 nnoremap <Leader>v :e ~/.vim/vimrc<CR>
 nnoremap <Leader>V :sp ~/.vim/vimrc<CR>
 
-" Search 
+" Search
 nnoremap <Leader>* /\<\><Left><Left>
 
 " Tags
@@ -142,7 +146,7 @@ vnoremap $ g_
 nnoremap <Leader>cd :cd %:p:h<CR>
 nnoremap <Leader>bg :let &background = ( &background == "dark"? "light" : "dark" )<CR>
 
-" Display syntax name or fg color 
+" Display syntax name or fg color
 nnoremap <Leader>h :echo synIDattr(synID(line("."), col("."), 1), "name")<CR>
 nnoremap <Leader>H :echo synIDattr(synIDtrans(synID(line("."), col("."), 1)), "fg")<CR>
 " source $VIMRUNTIME/syntax/hitest.vim
@@ -165,8 +169,8 @@ cnoremap <C-E> <END>
 
 " Navigation {{{2
 nnoremap <Leader>e :Explore<CR>
- 
-" Jump to definition and open it in vertical split 
+
+" Jump to definition and open it in vertical split
 nnoremap <silent> <Leader>T :let word=expand("<cword>")<CR>:vertical topleft split<CR>:wincmd w<cr>:exec("tag ". word)<CR>
 
 " Open a Quickfix window for the last search.
@@ -174,12 +178,12 @@ nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 
 " Keep the cursor in place while joining lines (emilyst)
 nnoremap J mzJ`z
- 
+
 " [count]S: Repeat [count] times the last modification
 nnoremap S :normal n.<CR>
 
 " Folds {{{2
-nnoremap <SPACE> za 
+nnoremap <SPACE> za
 nnoremap g1 A<SPACE>{{{1<ESC>
 nnoremap g2 A<SPACE>{{{2<ESC>
 nnoremap g3 A<SPACE>{{{3<ESC>
@@ -190,7 +194,7 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
-nnoremap <TAB> <C-w>w
+" nnoremap <TAB> <C-w>w
 
 " Close a window
 nnoremap <C-c>h <C-w>h:q<CR>
@@ -205,7 +209,7 @@ nnoremap <C-left> 5<C-W><
 nnoremap <C-right> 5<C-W>>
 
 " Tabs {{{2
-nnoremap <C-w>t :tabedit %<CR>
+" nnoremap <C-w>t :tabedit %<CR>
 
 " Faster  {{{2
 nnoremap Y y$
@@ -215,7 +219,8 @@ nnoremap Q :q<CR>
 " Options {{{1
 set ttyfast
 set hlsearch
-set vb t_vb=
+set novb vb t_vb=
+set novisualbell
 set splitright
 set shiftwidth=4
 set hidden
@@ -229,6 +234,7 @@ set virtualedit=block
 set grepprg=git\ grep\ -n\ $*
 " set grepprg=ag\ --nogroup\ --nocolor
 set number
+set colorcolumn=80
 
 " Adapt the background to the current time
 " if strftime("%H") > 8 && strftime("%H") < 17
@@ -266,9 +272,12 @@ set tags=./tags,tags,.git/tags
 " GUI {{{2
 if has('gui_running')
     set guioptions=g
-    " set guifont=Menlo:h17
+    " set guifont=InconsolataForPowerline\ Nerd\ Font\ Medium\ 16
+    " set guifont=FuraMonoForPowerline\ Nerd\ Font\ Medium\ 16
+    set guifont=FuraMonoForPowerline\ Nerd\ Font\ Medium\ 16
+    " set guifont=Menlo:h19
     " set guifont=Inconsolata:h20
-    set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Nerd\ Font\ Complete:h18
+    " set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Nerd\ Font\ Complete:h18
     set linespace=6
 else
     set t_Co=256
@@ -278,6 +287,7 @@ endif
 set statusline=
 set statusline+=%-20.20(%f\ %m%)
 set statusline+=%{fugitive#statusline()}
+" set statusline+=%{ale#statusline#Status()}
 set statusline+=%=
 set statusline+=%-14.(%c%V%)
 
@@ -361,19 +371,25 @@ Plug 'ctrlpvim/ctrlp.vim'
 let g:ctrlp_buftag_ctags_bin = '/usr/local/bin/ctags'
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
-map <D-b> :CtrlPBuffer<CR>
-map <D-g> :CtrlPBufTag<CR>
-map <D-t> :CtrlPTag<CR>
-map <D-s> :CtrlPCurFile<CR>
-nnoremap <D-u> :CtrlPMRU<CR>
-nnoremap <D-r> :CtrlPRoot<CR>
+
+execute "set <M-b>=\eb"
+nnoremap <M-b> :CtrlPBuffer<CR>
+execute "set <M-g>=\eg"
+nnoremap <M-g> :CtrlPTag<CR>
+" execute "set <M-t>=\et"
+" nnoremap <M-t> :CtrlPTag<CR>
+execute "set <M-t>=\es"
+nnoremap <M-t> :CtrlPTag<CR>
+execute "set <M-u>=\eu"
+nnoremap <M-u> :CtrlPMRU<CR>
+execute "set <M-r>=\er"
+nnoremap <M-r> :CtrlPRoot<CR>
 nnoremap <LocalLeader>a :CtrlPBookmarkDirAdd .<CR>
 let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
 
 " tpope/vim-fugitive {{{2
 Plug 'tpope/vim-fugitive'
 nnoremap gs :Gstatus<CR>
-nnoremap ga :Git add %<CR>
 nnoremap gw :Gwrite<CR>
 nnoremap go :Gcommit<CR>
 nnoremap gD :Gdiff<CR>
@@ -462,7 +478,7 @@ nnoremap =a:       :Tabularize  /:<CR>
 vnoremap =a:       :Tabularize  /:<CR>
 nnoremap =a,       :Tabularize  /,<CR>
 vnoremap =a,       :Tabularize  /,<CR>
- 
+
 
 " wellle/targets.vim {{{2
 Plug 'wellle/targets.vim'
@@ -491,15 +507,15 @@ Plug 'jeffkreeftmeijer/vim-numbertoggle'
 
 " itchyny/lightline.vim {{{2
 Plug 'itchyny/lightline.vim'
-let g:lightline = { 
+let g:lightline = {
             \ 'colorscheme': 'Tomorrow',
-            \ 'separator': { 'left': '⮀', 'right': '⮂' },
-            \ 'subseparator': { 'left': '⮁', 'right': '⮃' }
+            \ 'separator': { 'left': '', 'right': '' },
+            \ 'subseparator': { 'left': '|', 'right': '|' }
             \ }
 
 let g:lightline.active = {
             \ 'left': [['mode', 'paste', 'modified'],
-            \ ['filename', 'fugitive', 'virtualenv', 'syntastic']],
+            \ [ 'filename', 'fugitive', 'virtualenv', 'ale']],
             \ 'right': [['tagbar', 'lineinfo']],
             \ }
 
@@ -510,17 +526,34 @@ let g:lightline.inactive = {
 
 let g:lightline.component_function = {
             \ 'fugitive': 'MyFugitive',
-            \ 'tagbar': 'MyTagBar',
             \ 'virtualenv': 'MyVirtualEnv',
+            \ 'tagbar': 'MyTagBar',
+            \ 'ale': 'AleStatusLine',
             \ }
+
+let g:lightline.component = {
+    \ 'mode': '%{lightline#mode()}',
+    \ 'absolutepath': '%F',
+    \ 'relativepath': '%f',
+    \ 'filename': '%t',
+    \ 'modified': '%M',
+    \ 'bufnum': '%n',
+    \ 'paste': '%{&paste?"PASTE":""}',
+    \ 'readonly': '%R',
+    \ 'fileformat': '%{&ff}',
+    \ 'filetype': '%{&ft!=#""?&ft:"no ft"}',
+    \ 'percent': '%3p%%',
+    \ 'percentwin': '%P',
+    \ 'spell': '%{&spell?&spelllang:""}',
+    \ 'lineinfo': '%3l:%-2v' }
 
 let g:lightline.component_expand = {
-            \ 'syntastic': 'SyntasticStatuslineFlag',
+            \ 'ale': 'AleStatusLine',
             \ }
 
-let g:lightline.component_type = {
-            \ 'syntastic': 'error',
-            \ }
+" let g:lightline.component_type = {
+"             \ 'ale': 'warning',
+"             \ }
 
 " augroup AutoSyntastic
 "     autocmd!
@@ -546,7 +579,7 @@ function! s:lightline_update()
         return
     endif
     try
-        if g:colors_name =~# 'wombat\|solarized\|landscape\|jellybeans\|Tomorrow\|gotham'
+        if g:colors_name =~# 'wombat\|solarized\|landscape\|jellybeans\|Tomorrow\|gotham\|synthwave'
             let g:lightline.colorscheme =
                         \ substitute(substitute(g:colors_name, '-', '_', 'g'), '256.*', '', '') .
                         \ (g:colors_name ==# 'solarized' ? '_' . &background : '')
@@ -558,9 +591,13 @@ function! s:lightline_update()
     endtry
 endfunction
 
+
+function! AleStatusLine() 
+    return ale#statusline#Status()
+endfunction
+
 function! MyFugitive()
     if &ft !~? 'vimfiler' && exists("*fugitive#head")
-        " return fugitive#head()
         return fugitive#statusline()
     endif
     return ''
@@ -676,7 +713,7 @@ imap <C-j> <Plug>IMAP_JumpForward
 
 " scrooloose/nerdtree {{{2
 Plug 'scrooloose/nerdtree', {'on': 'NERDTreeCWD'}
-nnoremap <leader>n :NERDTreeCWD<CR>
+nnoremap <leader>N :NERDTreeCWD<CR>
 let NERDTreeHijackNetrw = 0
 
 
@@ -725,7 +762,7 @@ Plug 'jmcantrell/vim-virtualenv'
 
 
 " jmcantrell/vim-reporoot {{{2
-Plug 'jmcantrell/vim-reporoot' 
+Plug 'jmcantrell/vim-reporoot'
 
 
 " " vim-ctrlspace/vim-ctrlspace {{{2
@@ -750,8 +787,8 @@ Plug 'jmcantrell/vim-reporoot'
 
 
 " tweekmonster/django-plus.vim {{{2
-Plug 'tweekmonster/django-plus.vim'
- 
+" Plug 'tweekmonster/django-plus.vim'
+
 
 " tweekmonster/braceless.vim {{{2
 Plug 'tweekmonster/braceless.vim'
@@ -776,8 +813,8 @@ Plug 'rakr/vim-two-firewatch'
 
 " sloria/vim-ped {{{2
 Plug 'sloria/vim-ped', {'for': 'python'}
-autocmd Filetype python nmap <buffer> K <Plug>PedCwordExec
-autocmd Filetype python vmap <buffer> K <Plug>PedVwordExec
+" autocmd Filetype python nmap <buffer> K <Plug>PedCwordExec
+" autocmd Filetype python vmap <buffer> K <Plug>PedVwordExec
 
 
 " mhinz/vim-startify {{{2
@@ -825,6 +862,36 @@ Plug 'nvie/vim-flake8', {'for': 'python'}
 Plug 'AndrewRadev/bufferize.vim', {'on': 'Bufferize'}
 
 
+" w0rp/ale {{{2
+Plug 'w0rp/ale'
+" Write this in your vimrc file
+let g:ale_lint_on_save = 1
+let g:ale_lint_on_text_changed = 1
+" You can disable this option too
+" if you don't want linters to run on opening a file
+let g:ale_lint_on_enter = 1 
+
+
+" davidhalter/jedi-vim {{{2
+Plug 'davidhalter/jedi-vim'
+
+
+" goldfeld/vim-seek {{{2
+Plug 'goldfeld/vim-seek'
+
+" vim-pep8-indent
+
+" brooth/far.vim
+Plug 'brooth/far.vim'
+
+
+" kamwitsta/nordisk 
+Plug 'kamwitsta/nordisk'
+
 call plug#end()
 
-colorscheme two-firewatch
+if has('gui_running')
+    colorscheme Tomorrow-Night-Eighties
+else
+    colorscheme default
+endif
