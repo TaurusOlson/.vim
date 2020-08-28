@@ -1,5 +1,6 @@
 " Taurus Olson's vim configuration file
 
+
 " set nocompatible
 
 syntax on
@@ -10,17 +11,16 @@ filetype plugin indent on
 
 augroup vimrc_group
     autocmd!
-
     " cd into the current directory
     " autocmd BufEnter * if strpart(expand("%:h"), 0, 8) !=# 'fugitive' | silent cd %:p:h
     " autocmd BufEnter * if expand("%") !=# "~/.vimrc" | silent cd %:p:h
 
     " cd into the root of the source code repo
-    autocmd BufEnter * exe 'RepoRoot '.expand('%:p:h')
-    autocmd Filetype crontab  setlocal nobackup nowritebackup
+    " autocmd BufEnter * exe 'RepoRoot '.expand('%:p:h')
+    " autocmd Filetype crontab  setlocal nobackup nowritebackup
 
     " Resize splits when the window is resized
-    autocmd VimResized * exe "normal! \<c-w>="
+    " autocmd VimResized * exe "normal! \<c-w>="
 
     " Save when losing focus
     autocmd FocusLost * :silent! wall
@@ -36,12 +36,14 @@ augroup vimrc_group
 
     " Open vim help for word under cursor
     autocmd Filetype vim,help nnoremap <buffer> <silent> K :let word=expand("<cword>")<CR>:exec("help ". word)<CR>
+    autocmd Filetype help nnoremap <buffer> <silent> q :q<CR>
 
     " Execute the current line
     autocmd FileType vim nnoremap <Leader>S ^vg_y:execute @@<CR>
 
     " PYTHON
-    autocmd FileType python setlocal softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
+    autocmd FileType python setlocal softtabstop=4 tabstop=4 shiftwidth=4 foldnestmax=2
+    autocmd FileType python setlocal softtabstop=4 tabstop=4 shiftwidth=4 textwidth=88 fdm=indent foldnestmax=2
     " autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 
     " PROCESSING
@@ -65,7 +67,8 @@ augroup vimrc_group
     autocmd FileType rst setlocal suffixesadd=.rst
 
     " Quickfix
-    autocmd FileType qf setlocal cursorline
+    " autocmd FileType qf setlocal cursorline 
+    " autocmd FileType qf nnoremap <buffer> <silent> q :q<CR>
 
     " Clojure
     " Eval current line and jump to next element (use vim-sexp)
@@ -76,6 +79,7 @@ augroup vimrc_group
     " vim-fireplace)
     autocmd FileType clojure nmap <C-CR> yyp<Plug>FireplaceFilterabI;;<SPACE>=><SPACE><ESC>kJ0
     autocmd FileType clojure imap <C-CR> <ESC>yyp<Plug>FireplaceFilterabI;;<SPACE>=><SPACE><ESC>kJ0
+    autocmd FileType clojure nnoremap <C-C><C-K> :Require<CR>
     autocmd FileType clojure nnoremap m'g$ f;D``
 
     autocmd QuickFixCmdPost grep,make,grepadd,vimgrep,vimgrepadd,cscope,cfile,cgetfile,caddfile,helpgrep cwindow
@@ -89,6 +93,11 @@ augroup vimrc_group
     " GO
     autocmd FileType go setlocal softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
 
+    " JSON
+    autocmd FileType json setlocal equalprg=python\ -m\ json.tool
+
+    " SQL
+    autocmd FileType sql setlocal equalprg=sqlformat\ --reindent\ --keywords\ upper\ --identifiers\ lower\ -
 augroup END
 
 
@@ -101,19 +110,20 @@ let mapleader = ","
 let maplocalleader = "\\"
 inoremap kj <ESC>
 nnoremap <C-SPACE> :w<CR>
+tnoremap <Esc> <C-\><C-n>
 
-" For some reason <C-^> doesn't work on my Linux machine
+" For some reason <C-^> doesn
 nnoremap ² :e #<CR>
 nnoremap œ :e #<CR>
 
 " Paste (by sheerun)
 vnoremap <silent> y y`]
-vnoremap <silent> p p`]
-nnoremap <silent> p p`]
+" vnoremap <silent> p p`]
+" nnoremap <silent> p p`]
 
 " Paste and indent
-nnoremap p ]p
-nnoremap P [p
+" nnoremap p ]p
+" nnoremap P [p
 nnoremap =p :set paste!<CR>
 
 " Movements for paragraphs
@@ -143,8 +153,8 @@ nnoremap cuc :set cuc!<CR>
 
 nnoremap <LocalLeader><SPACE> :nohlsearch<CR>
 vnoremap $ g_
-nnoremap <Leader>cd :cd %:p:h<CR>
-nnoremap <Leader>bg :let &background = ( &background == "dark"? "light" : "dark" )<CR>
+nnoremap <Leader>c :cd %:p:h<CR>:echo 'Changed to ' . getcwd()<CR>
+nnoremap <Leader>b :let &background = ( &background == "dark"? "light" : "dark" )<CR>
 
 " Display syntax name or fg color
 nnoremap <Leader>h :echo synIDattr(synID(line("."), col("."), 1), "name")<CR>
@@ -175,6 +185,8 @@ nnoremap <silent> <Leader>T :let word=expand("<cword>")<CR>:vertical topleft spl
 
 " Open a Quickfix window for the last search.
 nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
+nnoremap <silent> <leader>P :cprev<CR>
+nnoremap <silent> <leader>N :cnext<CR>
 
 " Keep the cursor in place while joining lines (emilyst)
 nnoremap J mzJ`z
@@ -186,7 +198,7 @@ nnoremap S :normal n.<CR>
 nnoremap <SPACE> za
 nnoremap g1 A<SPACE>{{{1<ESC>
 nnoremap g2 A<SPACE>{{{2<ESC>
-nnoremap g3 A<SPACE>{{{3<ESC>
+nnoremap g3 A<SPACE>{{{3<ESC
 
 " Windows {{{2
 " Jump to a window
@@ -217,6 +229,9 @@ nnoremap Q :q<CR>
 
 
 " Options {{{1
+" set exrc
+" set secure
+set wildignore+=*/.git/*,*/tmp/*,*.swp
 set ttyfast
 set hlsearch
 set novb vb t_vb=
@@ -234,15 +249,15 @@ set virtualedit=block
 set grepprg=git\ grep\ -n\ $*
 " set grepprg=ag\ --nogroup\ --nocolor
 set number
-set colorcolumn=80
+" set colorcolumn=80
+set clipboard=unnamed
 
 " Adapt the background to the current time
-" if strftime("%H") > 8 && strftime("%H") < 17
-"     set background=light
-" else
-"     set background=dark
-" endif
-set background=dark
+if strftime("%H") > 8 && strftime("%H") < 17
+    set background=light
+else
+    set background=dark
+endif
 
 " Folds
 set nofoldenable
@@ -272,52 +287,22 @@ set tags=./tags,tags,.git/tags
 " GUI {{{2
 if has('gui_running')
     set guioptions=g
-    " set guifont=InconsolataForPowerline\ Nerd\ Font\ Medium\ 16
-    " set guifont=FuraMonoForPowerline\ Nerd\ Font\ Medium\ 16
-    set guifont=FuraMonoForPowerline\ Nerd\ Font\ Medium\ 16
+    " set guifont=InconsolataForPowerline\ Nerd\ Font\ Medium\ 15
+    " set guifont=FuraMonoForPowerline\ Nerd\ Font\ Medium\ 14
+    set guifont=Iosevka\ Regular\ 15
+    " set guifont=FiraCode\ Regular\ 14
     " set guifont=Menlo:h19
     " set guifont=Inconsolata:h20
     " set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Nerd\ Font\ Complete:h18
-    set linespace=6
+    set linespace=3
+elseif exists('g:GuiLoaded')
+    GuiFont! Iosevka:h15:l
+    GuiLinespace 3
 else
     set t_Co=256
 endif
 
-" Statusline  {{{2
-set statusline=
-set statusline+=%-20.20(%f\ %m%)
-set statusline+=%{fugitive#statusline()}
-" set statusline+=%{ale#statusline#Status()}
-set statusline+=%=
-set statusline+=%-14.(%c%V%)
-
-
 " Functions {{{1
-" StarRange {{{2
-" Author: Shuhei Kubota
-" Description: Search a string that you selected in visual mode.
-
-let s:StarRange__reg = ''
-
-function! s:StarRange__keepReg()
-  let s:StarRange__reg = @*
-endfunction
-
-function! s:StarRange__restoreReg()
-  let @* = s:StarRange__reg
-endfunction
-
-function! s:StarRange__substituteSpecialChars(str)
-    let result = escape(a:str, '\')
-    let result = substitute(result, '/', '\\/', 'g')
-    let result = substitute(result, '\r\n\|\r\|\n', '\\n', 'g')
-    return result
-endfunction
-
-xnoremap * :call <SID>StarRange__keepReg()<CR>gv"*y/\V<C-R>=<SID>StarRange__substituteSpecialChars(@*)<CR><CR>:call <SID>StarRange__restoreReg()<CR>:echo<CR>
-xnoremap # :call <SID>StarRange__keepReg()<CR>gv"*y?\V<C-R>=<SID>StarRange__substituteSpecialChars(@*)<CR><CR>:call <SID>StarRange__restoreReg()<CR>:echo<CR>
-
-
 " Useful file manipulation functions {{{2
 function! RemoveFile(...)
     if a:0 == 0
@@ -351,8 +336,9 @@ call plug#begin('~/.vim/bundle')
 
 " Use GitHub username if local source dir isn't set
 " (https://github.com/noahfrederick/dots/blob/master/vim/vimrc)
-let $PLUG_SRC = exists('$PROJECTS') ? $PROJECTS : 'TaurusOlson'
+let $PLUG_SRC = exists('$DBOX/Projects') ? $DBOX . '/Projects' : 'TaurusOlson'
 
+" colors {{{2
 Plug '$PLUG_SRC/darkburn.vim'
 Plug '$PLUG_SRC/hornet.vim'
 Plug '$PLUG_SRC/graffik.vim'
@@ -363,37 +349,76 @@ Plug 'w0ng/vim-hybrid'
 Plug 'dracula/vim'
 Plug 'sjl/badwolf'
 Plug 'whatyouhide/vim-gotham'
-Plug 'vim-scripts/plum.vim'
+Plug 'chriskempson/vim-tomorrow-theme'
+Plug 'kristijanhusak/vim-hybrid-material'
+let g:enable_bold_font = 0
+Plug 'ayu-theme/ayu-vim'
+" set termguicolors     " enable true colors support
+" let ayucolor="light"  " for light version of theme
+" let ayucolor="mirage" " for mirage version of theme
+" let ayucolor="dark"   " for dark version of theme
+Plug 'ajh17/Spacegray.vim'
+Plug 'rakr/vim-one'
+Plug 'davidklsn/vim-sialoquent'
+" let g:gitgutter_sign_modified = '•'
+" let g:gitgutter_sign_added = '+'
+" highlight GitGutterAdd guifg = '#A3E28B'
+Plug 'rakr/vim-two-firewatch'
+Plug 'arcticicestudio/nord-vim'
+let g:nord_italic = 0
+let g:nord_underline = 1
+let g:nord_italic_comments = 0
+let g:nord_uniform_status_lines = 1
+Plug 'franbach/miramare'
 
 
 " ctrlpvim/ctrlp.vim {{{2
 Plug 'ctrlpvim/ctrlp.vim'
-let g:ctrlp_buftag_ctags_bin = '/usr/local/bin/ctags'
+let g:ctrlp_buftag_ctags_bin = '/usr/bin/ctags'
 let g:ctrlp_map = '<c-p>'
 let g:ctrlp_cmd = 'CtrlP'
+if executable('rg')
+    set grepprg=rg\ --color=never
+    let g:ctrlp_user_command = 'rg %s --files --color=never --glob ""'
+    let g:ctrlp_use_caching = 1
+else
+    let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+    let g:ctrlp_use_caching = 1
+endif
+let g:ctrlp_by_filename = 1
 
-execute "set <M-b>=\eb"
+if has('gui_running')
+    execute "set <M-b>=\eb"
+    execute "set <M-g>=\eg"
+    execute "set <M-u>=\eu"
+    execute "set <M-r>=\er"
+    " execute "set <M-t>=\et"
+    " execute "set <M-t>=\es"
+endif
+
 nnoremap <M-b> :CtrlPBuffer<CR>
-execute "set <M-g>=\eg"
 nnoremap <M-g> :CtrlPTag<CR>
-" execute "set <M-t>=\et"
+nnoremap <M-t> :CtrlPBufTag<CR>
 " nnoremap <M-t> :CtrlPTag<CR>
-execute "set <M-t>=\es"
-nnoremap <M-t> :CtrlPTag<CR>
-execute "set <M-u>=\eu"
 nnoremap <M-u> :CtrlPMRU<CR>
-execute "set <M-r>=\er"
 nnoremap <M-r> :CtrlPRoot<CR>
 nnoremap <LocalLeader>a :CtrlPBookmarkDirAdd .<CR>
-let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+nnoremap <M-s> :CtrlPLine<CR>
+let g:ctrlp_clear_cache_on_exit = 1
+
+
+" tpope/vim-projectionist {{{2
+Plug 'tpope/vim-projectionist'
+
 
 " tpope/vim-fugitive {{{2
 Plug 'tpope/vim-fugitive'
 nnoremap gs :Gstatus<CR>
 nnoremap gw :Gwrite<CR>
 nnoremap go :Gcommit<CR>
+" nnoremap gD :Gdiff<CR><C-w>L
 nnoremap gD :Gdiff<CR>
-nnoremap gl :Glog<CR>
+nnoremap gb :Gblame<CR>
 nnoremap g<C-b> :echo fugitive#statusline()<CR>
 autocmd BufReadPost fugitive://* set bufhidden=delete
 autocmd FileType gitcommit setlocal cursorline
@@ -415,10 +440,6 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sensible'
 
 
-" tpope/vim-dispatch {{{2
-" Plug 'tpope/vim-dispatch'
-
-
 " SirVer/ultisnips {{{2
 Plug 'SirVer/ultisnips'
 let g:UltiSnipsExpandTrigger="<tab>"
@@ -434,16 +455,8 @@ Plug 'ervandew/supertab'
 let g:SuperTabDefaultCompletionType = "<C-N>"
 let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
 let g:SuperTabContextDiscoverDiscovery =
-    \ ["&omnifunc:<c-x><c-o>", "&completefunc:<c-x><c-u>",]
+    \ ["&omnifunc:<c-x><c-n>", "&completefunc:<c-x><c-u>",]
 let g:SuperTabDefaultCompletionType = "context"
-
-
-" " vim-scripts/Notes {{{2
-" Plug 'vim-scripts/Notes'
-" let g:notesRoot='~/Dropbox/Blogs/vimwiki/'
-" let g:notesFileType = 'vimwiki'
-" let g:notesFileExtension = '.wiki'
-" let g:notesWordSeparator = '_'
 
 
 " majutsushi/tagbar {{{2
@@ -455,10 +468,10 @@ let g:tagbar_autopreview = 0
 let g:tagbar_iconchars = ['▸','▾']
 
 
-" rking/ag.vim {{{2
-Plug 'rking/ag.vim', {'on': 'Ag'}
-nnoremap <Leader>a :Ag!<SPACE><c-r>=expand('<cword>')<CR><CR>
-nnoremap <Leader>A :Ag<SPACE>
+" " jremmen/vim-ripgrep {{{2
+" Plug 'jremmen/vim-ripgrep', {'on': 'Rg'}
+" nnoremap <LocalLeader>r :Rg<SPACE><c-r>=expand('<cword>')<CR><CR>
+" nnoremap <LocalLeader>R :Rg<SPACE>
 
 
 " plasticboy/vim-markdown {{{2
@@ -466,18 +479,6 @@ Plug 'plasticboy/vim-markdown', {'for': 'markdown'}
 let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_initial_foldlevel=0
 autocmd BufEnter *.html.pmd setlocal ft=markdown
-
-
-" godlygeek/tabular {{{2
-Plug 'godlygeek/tabular', {'on': 'Tabularize'}
-nnoremap =a<Space> :Tabularize  / /<CR>
-vnoremap =a<Space> :Tabularize  / /<CR>
-nnoremap =a=       :Tabularize  /=<CR>
-vnoremap =a=       :Tabularize  /=<CR>
-nnoremap =a:       :Tabularize  /:<CR>
-vnoremap =a:       :Tabularize  /:<CR>
-nnoremap =a,       :Tabularize  /,<CR>
-vnoremap =a,       :Tabularize  /,<CR>
 
 
 " wellle/targets.vim {{{2
@@ -488,19 +489,6 @@ Plug 'wellle/targets.vim'
 Plug 'mattn/emmet-vim', {'for': ['html', 'htmldjango']}
 
 
-" vim-scripts/Vim-R-plugin {{{2
-Plug 'jcfaria/Vim-R-plugin', {'for': 'r'}
-" Lines added by the Vim-R-plugin command :RpluginConfig (2014-Sep-24 00:10):
-" Press the space bar to send lines (in Normal mode) and selections to R:
-autocmd FileType r vmap <buffer> <Space> <Plug>RDSendSelection
-autocmd FileType r nmap <buffer> <Space> <Plug>RDSendLine
-
-
-" csexton/jekyll.vim {{{2
-Plug 'csexton/jekyll.vim', {'on': 'JekyllList'}
-let g:jekyll_path = "~/Blog/taurusolson.github.com"
-
-
 " jeffkreeftmeijer/vim-numbertoggle {{{2
 Plug 'jeffkreeftmeijer/vim-numbertoggle'
 
@@ -508,14 +496,13 @@ Plug 'jeffkreeftmeijer/vim-numbertoggle'
 " itchyny/lightline.vim {{{2
 Plug 'itchyny/lightline.vim'
 let g:lightline = {
-            \ 'colorscheme': 'Tomorrow',
             \ 'separator': { 'left': '', 'right': '' },
-            \ 'subseparator': { 'left': '|', 'right': '|' }
+            \ 'subseparator': { 'left': '•', 'right': '•' }
             \ }
 
 let g:lightline.active = {
             \ 'left': [['mode', 'paste', 'modified'],
-            \ [ 'filename', 'fugitive', 'virtualenv', 'ale']],
+            \ ['filename', 'virtualenv', 'fugitive']],
             \ 'right': [['tagbar', 'lineinfo']],
             \ }
 
@@ -528,8 +515,8 @@ let g:lightline.component_function = {
             \ 'fugitive': 'MyFugitive',
             \ 'virtualenv': 'MyVirtualEnv',
             \ 'tagbar': 'MyTagBar',
-            \ 'ale': 'AleStatusLine',
             \ }
+            " \ 'ale': 'ALEGetStatusLine',
 
 let g:lightline.component = {
     \ 'mode': '%{lightline#mode()}',
@@ -546,14 +533,6 @@ let g:lightline.component = {
     \ 'percentwin': '%P',
     \ 'spell': '%{&spell?&spelllang:""}',
     \ 'lineinfo': '%3l:%-2v' }
-
-let g:lightline.component_expand = {
-            \ 'ale': 'AleStatusLine',
-            \ }
-
-" let g:lightline.component_type = {
-"             \ 'ale': 'warning',
-"             \ }
 
 " augroup AutoSyntastic
 "     autocmd!
@@ -579,7 +558,7 @@ function! s:lightline_update()
         return
     endif
     try
-        if g:colors_name =~# 'wombat\|solarized\|landscape\|jellybeans\|Tomorrow\|gotham\|synthwave'
+        if g:colors_name =~# 'gruvbox\|hybrid\|molokai\|dracula\|wombat\|solarized\|jellybeans\|Tomorrow\|gotham\|synthwave\|nord'
             let g:lightline.colorscheme =
                         \ substitute(substitute(g:colors_name, '-', '_', 'g'), '256.*', '', '') .
                         \ (g:colors_name ==# 'solarized' ? '_' . &background : '')
@@ -604,7 +583,7 @@ function! MyFugitive()
 endfunction
 
 function! MyTagBar()
-    return tagbar#currenttag('%s','')
+    return tagbar#currenttag('%s','', 'f')
 endfunction
 
 function! MyVirtualEnv()
@@ -614,243 +593,63 @@ function! MyVirtualEnv()
     return ''
 endfunction
 
-
-" mbbill/undotree {{{2
-Plug 'mbbill/undotree', {'on': 'UndotreeToggle'}
-nnoremap <LocalLeader>g :UndotreeToggle<CR>
-
-
 " Raimondi/delimitMate {{{2
 Plug 'Raimondi/delimitMate'
 let delimitMate_expand_cr = 1
+let delimitMate_expand_space = 1
 
 
-" luochen1990/rainbow {{{2
-Plug 'luochen1990/rainbow', { 'for': 'clojure' }
-let g:rainbow_active = 1
+" airblade/vim-rooter {{{2
+Plug 'airblade/vim-rooter'
+let g:rooter_change_directory_for_non_project_files = ''
+let g:rooter_change_directory_for_non_project_files = 'current'
+let g:rooter_silent_chdir = 1
 
 
-" matze/vim-tex-fold {{{2
-Plug 'matze/vim-tex-fold', { 'for': 'tex' }
+" mhinz/vim-signify {{{2
+Plug 'mhinz/vim-signify'
+nnoremap gh :SignifyToggleHighlight<CR>
 
 
-" vim-pandoc/vim-pandoc {{{2
-" Plug 'vim-pandoc/vim-pandoc'
-
-
-" vim-pandoc/vim-pandoc-syntax
-" Plug 'vim-pandoc/vim-pandoc-syntax'
-
-
-" vim-pandoc/vim-rmarkdown {{{2
-" Plug 'vim-pandoc/vim-rmarkdown', {'for': 'rmarkdown'}
-
-
-" airblade/vim-gitgutter {{{2
-Plug 'airblade/vim-gitgutter'
-
-
-" ap/vim-css-color {{{2
-Plug 'ap/vim-css-color'
-
-
-" vim-scripts/jcommenter.vim {{{2
-Plug 'vim-scripts/jcommenter.vim', {'for': 'java'}
-autocmd FileType java let b:jcommenter_class_author='Taurus Olson (taurusolson@gmail.com)'
-autocmd FileType java let b:jcommenter_file_author='Taurus Olson (taurusolson@gmail.com)'
-autocmd FileType java source ~/.vim/bundle/jcommenter.vim/plugin/jcommenter.vim
-autocmd FileType java map gm :call JCommentWriter()<CR>
-" autocmd Filetype java set makeprg=javac\ %
-autocmd Filetype java command! Java execute "! basename % .java | xargs java"
-
-
-" cakebaker/scss-syntax.vim {{{2
-" Plug 'cakebaker/scss-syntax.vim', {'for': 'scss'}
-
-
-" " fboender/bexec {{{2
-" Plug 'fboender/bexec'
-" let g:bexec_filter_types = {'python': 'python '}
-
-
-" " christoomey/vim-tmux-navigator {{{2
-" Plug 'christoomey/vim-tmux-navigator'
-" nnoremap <silent> <C-h> :TmuxNavigateLeft<cr>
-" nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
-" nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
-" nnoremap <silent> <C-l> :TmuxNavigateRight<cr>
-
-
-" " joonty/vim-do {{{2
-" Plug 'joonty/vim-do'
-" let g:do_new_buffer_size=1000
+" segeljakt/vim-silicon {{{2
+Plug 'segeljakt/vim-silicon', {'on': 'Silicon'}
 
 
 " junegunn/gv.vim {{{2
 Plug 'junegunn/gv.vim', {'on': 'GV'}
-nnoremap gv :GV<CR>
-nnoremap gV :GV!<CR>
-
-
-" chriskempson/vim-tomorrow-theme {{{2
-Plug 'chriskempson/vim-tomorrow-theme'
-
-
-" kristijanhusak/vim-hybrid-material {{{2
-Plug 'kristijanhusak/vim-hybrid-material'
-let g:enable_bold_font = 0
-
-
-" tpope/vim-projectionist {{{2
-Plug 'tpope/vim-projectionist'
-
-
-" vim-latex/vim-latex {{{2
-Plug 'vim-latex/vim-latex'
-nmap <C-=> <Plug>IMAP_JumpForward
-imap <C-j> <Plug>IMAP_JumpForward
+nnoremap gl :GV<CR>
+nnoremap gL :GV!<CR>
 
 
 " scrooloose/nerdtree {{{2
 Plug 'scrooloose/nerdtree', {'on': 'NERDTreeCWD'}
-nnoremap <leader>N :NERDTreeCWD<CR>
 let NERDTreeHijackNetrw = 0
 
 
-" aperezdc/vim-template {{{2
-Plug 'aperezdc/vim-template'
-let g:username=$GITHUB_USER_NAME
-let g:email=$GITHUB_USER_EMAIL
-
-
-" " Valloric/YouCompleteMe {{{2
-" Plug 'Valloric/YouCompleteMe'
-" let g:ycm_confirm_extra_conf = 0
-" let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-" let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-
-
-"  fatih/vim-go {{{2
-Plug 'fatih/vim-go', {'for': 'go'}
-let g:go_auto_type_info = 1
-let g:go_highlight_functions = 1
-let g:go_highlight_methods = 1
-let g:go_highlight_structs = 1
-let g:go_highlight_interfaces = 1
-let g:go_highlight_operators = 1
-let g:go_highlight_build_constraints = 1
-au FileType go nmap <buffer> <LocalLeader>r <Plug>(go-run)
-au FileType go nmap <buffer> <LocalLeader>b <Plug>(go-build)
-au FileType go nmap <buffer> <LocalLeader>t <Plug>(go-test)
-au FileType go nmap <buffer> <LocalLeader>c <Plug>(go-coverage)
-au FileType go nmap <buffer> <LocalLeader>ds <Plug>(go-def-split)
-au FileType go nmap <buffer> <LocalLeader>dv <Plug>(go-def-vertical)
-au FileType go nmap <buffer> <LocalLeader>dt <Plug>(go-def-tab)
-au FileType go nmap <buffer> <LocalLeader>gd <Plug>(go-doc)
-au FileType go nmap <buffer> <LocalLeader>gv <Plug>(go-doc-vertical)
-au FileType go nmap <buffer> <LocalLeader>i <Plug>(go-info)
-au FileType go nmap <buffer> <LocalLeader>e <Plug>(go-rename)
-au FileType go nmap <buffer> <LocalLeader>gb <Plug>(go-doc-browser)
-
-
-" junegunn/goyo.vim {{{2
-Plug 'junegunn/goyo.vim', {'on': 'Goyo'}
-
-
-" jmcantrell/vim-virtualenv {{{2
-Plug 'jmcantrell/vim-virtualenv'
-
-
-" jmcantrell/vim-reporoot {{{2
-Plug 'jmcantrell/vim-reporoot'
-
-
-" " vim-ctrlspace/vim-ctrlspace {{{2
-" Plug 'vim-ctrlspace/vim-ctrlspace'
-" let g:CtrlSpaceSearchTiming = 500
-" hi link CtrlSpaceNormal   PMenu
-" hi link CtrlSpaceSelected PMenuSel
-" hi link CtrlSpaceSearch   Search
-" hi link CtrlSpaceStatus   StatusLine
-" hi link CtrlSpaceSearch IncSearch
-" if executable("ag")
-"     let g:CtrlSpaceGlobCommand = 'ag -l --nocolor -g ""'
-" endif
-
-
-" Shougo/vimshell.vim {{{2
-" Plug 'Shougo/vimshell.vim'
-
-
-" Shougo/vimproc.vim {{{2
-" Plug 'Shougo/vimproc.vim'
-
-
-" tweekmonster/django-plus.vim {{{2
-" Plug 'tweekmonster/django-plus.vim'
+" plytophogy/vim-virtualenv {{{2
+let g:virtualenv_stl_format = '[%n]'
+Plug 'plytophogy/vim-virtualenv', {'for': 'python'}
 
 
 " tweekmonster/braceless.vim {{{2
 Plug 'tweekmonster/braceless.vim'
-autocmd FileType python BracelessEnable +fold
+" autocmd FileType python BracelessEnable +fold
 autocmd FileType python BracelessEnable +indent
+let g:braceless_jump_prev_key = '['
+let g:braceless_jump_next_key = ']'
 
 
 " mhinz/vim-grepper {{{2
-Plug 'mhinz/vim-grepper'
+Plug 'mhinz/vim-grepper', { 'on': ['Grepper', 'GrepperRg', '<plug>(GrepperOperator)'] }
+let g:grepper = {}
+let g:grepper.tools = ['rg', 'grep', 'git']
 nmap gr <plug>(GrepperOperator)
 xmap gr <plug>(GrepperOperator)
-
-
-" vim-scripts/project.tar.gz {{{2
-Plug 'vim-scripts/project.tar.gz', {'on': 'Project'}
-nnoremap <leader>p :Project<CR>
-
-
-" rakr/vim-two-firewatch {{{2
-Plug 'rakr/vim-two-firewatch'
-
-
-" sloria/vim-ped {{{2
-Plug 'sloria/vim-ped', {'for': 'python'}
-" autocmd Filetype python nmap <buffer> K <Plug>PedCwordExec
-" autocmd Filetype python vmap <buffer> K <Plug>PedVwordExec
-
-
-" mhinz/vim-startify {{{2
-Plug 'mhinz/vim-startify'
-let g:startify_bookmarks = [{'o': '~/Dropbox/Projects/olson2/olson/manage.py'},
-            \ {'f': '~/Dropbox/Projects/fntools/fntools/fntools.py'},
-            \ {'s': '~/Dropbox/Projects/savage/svg.py'},
-            \ {'t': '~/Dropbox/Projects/time-machine/timemachine/app.py'},
-            \ {'g': '~/Dropbox/Projects/django-git/git/models.py'},
-            \ {'c': '~/Dropbox/Projects/contemplation/contemplation.py'}]
-let g:ascii = [
-            \ '                     __',
-            \ '             .--.--.|__|.--------.',
-            \ '             |  |  ||  ||        |',
-            \ '              \___/ |__||__|__|__|',
-            \ ''
-            \]
-
-let g:ascii = [ '   Welcome ' . $USER ]
-
-let g:startify_custom_header = g:ascii
-let g:startify_list_order = [
-        \ ['   Projects:'],
-        \ 'bookmarks',
-        \ ['   MRU files:'],
-        \ 'files',
-        \ ['   Sessions:'],
-        \ 'sessions',
-        \ ]
-let g:startify_enable_special = 0
-let g:startify_change_to_dir = 1
-autocmd User Startified let &l:stl = '   Current time: ' . strftime('%H:%M')
-
-
-" chrisbra/csv.vim {{{2
-Plug 'chrisbra/csv.vim', {'for': 'csv'}
+nnoremap <leader>* :Grepper -tool rg -cword -noprompt<cr>
+nnoremap g: :GrepperRg<SPACE>
+" let g:grepper.prompt = 0
+" let g:grepper.side = 1
+let g:grepper.highlight = 1
 
 
 " nvie/vim-flake8 {{{2
@@ -858,40 +657,156 @@ Plug 'nvie/vim-flake8', {'for': 'python'}
 " autocmd BufWritePost **/*.py call Flake8()
 
 
-" AndrewRadev/bufferize.vim {{{2
-Plug 'AndrewRadev/bufferize.vim', {'on': 'Bufferize'}
+" psf/black {{{2
+Plug 'psf/black', {'commit': 'ce14fa8b497bae2b50ec48b3bd7022573a59cdb1' , 'for': 'python'}
 
 
 " w0rp/ale {{{2
 Plug 'w0rp/ale'
 " Write this in your vimrc file
 let g:ale_lint_on_save = 1
-let g:ale_lint_on_text_changed = 1
+let g:ale_lint_on_text_changed = 0
 " You can disable this option too
 " if you don't want linters to run on opening a file
-let g:ale_lint_on_enter = 1 
+let g:ale_lint_on_enter = 1
+let g:ale_linters = {'python': ['black', 'flake8']}
 
 
 " davidhalter/jedi-vim {{{2
-Plug 'davidhalter/jedi-vim'
+Plug 'davidhalter/jedi-vim', {'for': 'python'}
+" let g:jedi#auto_initialization = 1
+let g:jedi#popup_on_dot = 0
+" let g:jedi#show_call_signatures = 1
+
+" Vimjas/vim-python-pep8-indent {{{2
+Plug 'Vimjas/vim-python-pep8-indent', {'for': 'python'}
+
+" chrisbra/csv.vim {{{2
+Plug 'chrisbra/csv.vim', {'for': 'csv'}
 
 
-" goldfeld/vim-seek {{{2
-Plug 'goldfeld/vim-seek'
-
-" vim-pep8-indent
-
-" brooth/far.vim
-Plug 'brooth/far.vim'
+" ivalkeen/vim-simpledb {{{2
+Plug 'ivalkeen/vim-simpledb'
 
 
-" kamwitsta/nordisk 
-Plug 'kamwitsta/nordisk'
+" tpope/vim-dadbod {{{2
+Plug 'tpope/vim-dadbod'
+" :DB postgresql://pricing_ro@db2-vrack.abc-culture.fr:6423/pricing < %
+
+
+" tpope/vim-dispatch {{{2
+Plug 'tpope/vim-dispatch'
+
+
+" tpope/obsession {{{2
+Plug 'tpope/vim-obsession'
+
+" vim-scripts/dbext.vim {{{2
+Plug 'vim-scripts/dbext.vim'
+
+
+" terryma/vim-multiple-cursors {{{2
+" Plug 'terryma/vim-multiple-cursors'
+
+
+" AaronLasseigne/yank-code {{{2
+Plug 'AaronLasseigne/yank-code', {'on': 'YankCode'}
+
+
+" " easymotion/vim-easymotion {{{2
+" Plug 'easymotion/vim-easymotion'
+" nmap M <Plug>(easymotion-overwin-f2)
+" map  <Leader>w <Plug>(easymotion-bd-w)
+" nmap <Leader>w <Plug>(easymotion-overwin-w)
+" map  ? <Plug>(easymotion-sn)
+" omap ? <Plug>(easymotion-tn)
+
+
+" kalekundert/vim-coiled-snake {{{2
+Plug 'kalekundert/vim-coiled-snake', {'for': 'python'}
+
+" Konfekt/FastFold {{{2
+Plug 'Konfekt/FastFold'
+nmap zuz <Plug>(FastFoldUpdate)
+let g:fastfold_savehook = 1
+let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
+let g:fastfold_fold_movement_commands = [']z', '[z', 'zj', 'zk']
+
+
+" cespare/vim-toml {{{2
+Plug 'cespare/vim-toml', {'for': 'toml'}
+
+
+" chrisbra/NrrwRgn {{{2
+Plug 'chrisbra/NrrwRgn'
+
+
+" mgedmin/coverage-highlight.vim {{{2
+" Plug 'mgedmin/coverage-highlight.vim'
+
+
+" alfredodeza/coveragepy.vim
+" Plug 'alfredodeza/coveragepy.vim'
+
+
+" alfredodeza/pytest.vim {{{2
+Plug 'alfredodeza/pytest.vim'
 
 call plug#end()
 
-if has('gui_running')
-    colorscheme Tomorrow-Night-Eighties
+if has('gui_running') || exists('g:GuiLoaded')
+    colorscheme hybrid
 else
     colorscheme default
 endif
+
+
+" StarRange {{{2
+" Author: Shuhei Kubota
+" Description: Search a string that you selected in visual mode.
+
+let s:StarRange__reg = ''
+
+function! s:StarRange__keepReg()
+  let s:StarRange__reg = @*
+endfunction
+
+function! s:StarRange__restoreReg()
+  let @* = s:StarRange__reg
+endfunction
+
+function! s:StarRange__substituteSpecialChars(str)
+    let result = escape(a:str, '\')
+    let result = substitute(result, '/', '\\/', 'g')
+    let result = substitute(result, '\r\n\|\r\|\n', '\\n', 'g')
+    return result
+endfunction
+
+
+xnoremap * :call <SID>StarRange__keepReg()<CR>gv"*y/\V<C-R>=<SID>StarRange__substituteSpecialChars(@*)<CR><CR>:call <SID>StarRange__restoreReg()<CR>:echo<CR>
+xnoremap # :call <SID>StarRange__keepReg()<CR>gv"*y?\V<C-R>=<SID>StarRange__substituteSpecialChars(@*)<CR><CR>:call <SID>StarRange__restoreReg()<CR>:echo<CR>
+
+
+" Projects
+
+" TODO Allow to select any directory in g:projects_dir instead of defining g:projects_names
+let g:projects_dir = '~/Projects/work/'
+let g:projects_names = [
+            \'platform_integration',
+            \'kazuhira',
+            \'backoffice',
+            \'pricing',
+            \'cdiscount',
+            \'rakuten-ws',
+            \'skully',
+            \]
+
+function! ListProjects(A, L, P)
+    return g:projects_names
+endfunction
+ 
+function! JumpToProject(name)
+    execute "edit" . g:projects_dir . a:name
+endfunction
+
+command! -nargs=1 -complete=customlist,ListProjects Project :call JumpToProject(<f-args>)
