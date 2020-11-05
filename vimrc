@@ -440,7 +440,7 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sensible'
 
 
-" SirVer/ultisnips {{{2
+" " SirVer/ultisnips {{{2
 Plug 'SirVer/ultisnips'
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
@@ -466,12 +466,6 @@ let g:tagbar_sort = 0
 let g:tagbar_compact = 1
 let g:tagbar_autopreview = 0
 let g:tagbar_iconchars = ['▸','▾']
-
-
-" " jremmen/vim-ripgrep {{{2
-" Plug 'jremmen/vim-ripgrep', {'on': 'Rg'}
-" nnoremap <LocalLeader>r :Rg<SPACE><c-r>=expand('<cword>')<CR><CR>
-" nnoremap <LocalLeader>R :Rg<SPACE>
 
 
 " plasticboy/vim-markdown {{{2
@@ -611,14 +605,14 @@ Plug 'mhinz/vim-signify'
 nnoremap gh :SignifyToggleHighlight<CR>
 
 
-" segeljakt/vim-silicon {{{2
-Plug 'segeljakt/vim-silicon', {'on': 'Silicon'}
-
-
 " junegunn/gv.vim {{{2
 Plug 'junegunn/gv.vim', {'on': 'GV'}
 nnoremap gl :GV<CR>
 nnoremap gL :GV!<CR>
+
+
+" junegunn/vim-peekaboo {{{2
+Plug 'junegunn/vim-peekaboo'
 
 
 " scrooloose/nerdtree {{{2
@@ -739,14 +733,6 @@ Plug 'cespare/vim-toml', {'for': 'toml'}
 
 " chrisbra/NrrwRgn {{{2
 Plug 'chrisbra/NrrwRgn'
-
-
-" mgedmin/coverage-highlight.vim {{{2
-" Plug 'mgedmin/coverage-highlight.vim'
-
-
-" alfredodeza/coveragepy.vim
-" Plug 'alfredodeza/coveragepy.vim'
 
 
 " alfredodeza/pytest.vim {{{2
