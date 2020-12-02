@@ -251,6 +251,7 @@ set grepprg=git\ grep\ -n\ $*
 set number
 " set colorcolumn=80
 set clipboard=unnamed
+set maxmempattern=100000
 
 " Adapt the background to the current time
 if strftime("%H") > 8 && strftime("%H") < 17
@@ -652,7 +653,7 @@ Plug 'nvie/vim-flake8', {'for': 'python'}
 
 
 " psf/black {{{2
-Plug 'psf/black', {'commit': 'ce14fa8b497bae2b50ec48b3bd7022573a59cdb1' , 'for': 'python'}
+Plug 'psf/black', {'for': 'python'}
 
 
 " w0rp/ale {{{2
@@ -737,6 +738,11 @@ Plug 'chrisbra/NrrwRgn'
 
 " alfredodeza/pytest.vim {{{2
 Plug 'alfredodeza/pytest.vim'
+
+
+" Olical/conjure {{{2
+Plug 'Olical/conjure', {'tag': 'v4.9.0'}
+
 
 call plug#end()
 
