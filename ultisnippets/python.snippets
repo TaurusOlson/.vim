@@ -2,6 +2,10 @@
 #                            TEXTMATE SNIPPETS                            #
 ###########################################################################
 
+snippet imp
+import ${1:module}
+endsnippet
+
 snippet header 
 """${1:description}
 
@@ -503,7 +507,7 @@ import pudb; pudb.set_trace()
 endsnippet
 
 snippet ae "Assert equal" b
-self.assertEqual(${1:first},${2:second})
+self.assertEqual(${1:first}, ${2:second})
 endsnippet
 
 snippet at "Assert True" b
@@ -553,6 +557,13 @@ endsnippet
 
 snippet :r "What a function returns" b
 :returns: ${1:desc}
+endsnippet
+
+snippet aaa "Arrange, act, Assert" b
+# ARRANGE
+${1}
+# ACT
+# ASSERT
 endsnippet
 
 # vim:ft=snippets:

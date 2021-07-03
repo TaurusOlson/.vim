@@ -9,19 +9,9 @@ filetype plugin indent on
 
 " Autocmds {{{1
 
+
 augroup vimrc_group
     autocmd!
-    " cd into the current directory
-    " autocmd BufEnter * if strpart(expand("%:h"), 0, 8) !=# 'fugitive' | silent cd %:p:h
-    " autocmd BufEnter * if expand("%") !=# "~/.vimrc" | silent cd %:p:h
-
-    " cd into the root of the source code repo
-    " autocmd BufEnter * exe 'RepoRoot '.expand('%:p:h')
-    " autocmd Filetype crontab  setlocal nobackup nowritebackup
-
-    " Resize splits when the window is resized
-    " autocmd VimResized * exe "normal! \<c-w>="
-
     " Save when losing focus
     autocmd FocusLost * :silent! wall
 
@@ -42,8 +32,7 @@ augroup vimrc_group
     autocmd FileType vim nnoremap <Leader>S ^vg_y:execute @@<CR>
 
     " PYTHON
-    autocmd FileType python setlocal softtabstop=4 tabstop=4 shiftwidth=4 foldnestmax=2
-    autocmd FileType python setlocal softtabstop=4 tabstop=4 shiftwidth=4 textwidth=88 fdm=indent foldnestmax=2
+    autocmd FileType python setlocal foldenable softtabstop=4 tabstop=4 shiftwidth=4 textwidth=88 fdm=marker foldlevelstart=0
     " autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
 
     " PROCESSING
@@ -67,20 +56,8 @@ augroup vimrc_group
     autocmd FileType rst setlocal suffixesadd=.rst
 
     " Quickfix
-    " autocmd FileType qf setlocal cursorline 
-    " autocmd FileType qf nnoremap <buffer> <silent> q :q<CR>
-
-    " Clojure
-    " Eval current line and jump to next element (use vim-sexp)
-    autocmd FileType clojure nmap <buffer> <CR> :Eval<CR><Plug>(sexp_move_to_next_element_head)
-    " Eval current line
-    autocmd FileType clojure nnoremap <buffer> <S-CR> :Eval<CR>
-    " Eval current line and write its result at the end of the line (use
-    " vim-fireplace)
-    autocmd FileType clojure nmap <C-CR> yyp<Plug>FireplaceFilterabI;;<SPACE>=><SPACE><ESC>kJ0
-    autocmd FileType clojure imap <C-CR> <ESC>yyp<Plug>FireplaceFilterabI;;<SPACE>=><SPACE><ESC>kJ0
-    autocmd FileType clojure nnoremap <C-C><C-K> :Require<CR>
-    autocmd FileType clojure nnoremap m'g$ f;D``
+    autocmd FileType qf setlocal cursorline 
+    autocmd FileType qf nnoremap <buffer> <silent> q :q<CR>
 
     autocmd QuickFixCmdPost grep,make,grepadd,vimgrep,vimgrepadd,cscope,cfile,cgetfile,caddfile,helpgrep cwindow
     autocmd QuickFixCmdPost lgrep,lmake,lgrepadd,lvimgrep,lvimgrepadd,lfile,lgetfile,laddfile lwindow
@@ -98,6 +75,9 @@ augroup vimrc_group
 
     " SQL
     autocmd FileType sql setlocal equalprg=sqlformat\ --reindent\ --keywords\ upper\ --identifiers\ lower\ -
+
+    " Save last position
+    au BufReadPost * if line("'\"") | execute("normal `\"") | endif
 augroup END
 
 
@@ -118,12 +98,8 @@ nnoremap œ :e #<CR>
 
 " Paste (by sheerun)
 vnoremap <silent> y y`]
-" vnoremap <silent> p p`]
-" nnoremap <silent> p p`]
 
 " Paste and indent
-" nnoremap p ]p
-" nnoremap P [p
 nnoremap =p :set paste!<CR>
 
 " Movements for paragraphs
@@ -143,7 +119,7 @@ nnoremap <Leader>* /\<\><Left><Left>
 
 " Tags
 nnoremap <Leader>t <C-]>
-nnoremap <LocalLeader>t :!/usr/local/bin/ctags -R .<CR>
+" nnoremap <LocalLeader>t :!/usr/local/bin/ctags -R .<CR>
 
 " Togglable options
 nnoremap cor :set relativenumber!<CR>
@@ -188,9 +164,6 @@ nnoremap <silent> <leader>? :execute 'vimgrep /'.@/.'/g %'<CR>:copen<CR>
 nnoremap <silent> <leader>P :cprev<CR>
 nnoremap <silent> <leader>N :cnext<CR>
 
-" Keep the cursor in place while joining lines (emilyst)
-nnoremap J mzJ`z
-
 " [count]S: Repeat [count] times the last modification
 nnoremap S :normal n.<CR>
 
@@ -220,9 +193,6 @@ nnoremap <C-down> 5<C-W>-
 nnoremap <C-left> 5<C-W><
 nnoremap <C-right> 5<C-W>>
 
-" Tabs {{{2
-" nnoremap <C-w>t :tabedit %<CR>
-
 " Faster  {{{2
 nnoremap Y y$
 nnoremap Q :q<CR>
@@ -231,6 +201,7 @@ nnoremap Q :q<CR>
 " Options {{{1
 " set exrc
 " set secure
+set mouse=a
 set wildignore+=*/.git/*,*/tmp/*,*.swp
 set ttyfast
 set hlsearch
@@ -297,8 +268,12 @@ if has('gui_running')
     " set guifont=Droid\ Sans\ Mono\ for\ Powerline\ Nerd\ Font\ Complete:h18
     set linespace=3
 elseif exists('g:GuiLoaded')
-    GuiFont! Iosevka:h15:l
+    " GuiFont! Iosevka:h15:l
+    GuiFont! JetBrains Mono:h14:w50
     GuiLinespace 3
+elseif exists('g:gonvim_running')
+    set linespace=5
+    set guifont=Iosevka:h15:l
 else
     set t_Co=256
 endif
@@ -340,30 +315,23 @@ call plug#begin('~/.vim/bundle')
 let $PLUG_SRC = exists('$DBOX/Projects') ? $DBOX . '/Projects' : 'TaurusOlson'
 
 " colors {{{2
+Plug 'co1ncidence/mountaineer.vim'
+Plug 'co1ncidence/javacafe.vim'
+Plug 'ghifarit53/tokyonight-vim'
+let g:tokyonight_style = 'storm' " available: night, storm
+let g:tokyonight_enable_italic = 0
+let g:tokyonight_menu_selection_background = 'red'
+
 Plug '$PLUG_SRC/darkburn.vim'
 Plug '$PLUG_SRC/hornet.vim'
 Plug '$PLUG_SRC/graffik.vim'
 Plug '$PLUG_SRC/creature.vim'
-Plug 'altercation/vim-colors-solarized'
 Plug 'morhetz/gruvbox'
 Plug 'w0ng/vim-hybrid'
 Plug 'dracula/vim'
-Plug 'sjl/badwolf'
-Plug 'whatyouhide/vim-gotham'
 Plug 'chriskempson/vim-tomorrow-theme'
 Plug 'kristijanhusak/vim-hybrid-material'
 let g:enable_bold_font = 0
-Plug 'ayu-theme/ayu-vim'
-" set termguicolors     " enable true colors support
-" let ayucolor="light"  " for light version of theme
-" let ayucolor="mirage" " for mirage version of theme
-" let ayucolor="dark"   " for dark version of theme
-Plug 'ajh17/Spacegray.vim'
-Plug 'rakr/vim-one'
-Plug 'davidklsn/vim-sialoquent'
-" let g:gitgutter_sign_modified = '•'
-" let g:gitgutter_sign_added = '+'
-" highlight GitGutterAdd guifg = '#A3E28B'
 Plug 'rakr/vim-two-firewatch'
 Plug 'arcticicestudio/nord-vim'
 let g:nord_italic = 0
@@ -371,6 +339,7 @@ let g:nord_underline = 1
 let g:nord_italic_comments = 0
 let g:nord_uniform_status_lines = 1
 Plug 'franbach/miramare'
+Plug 'AhmedAbdulrahman/aylin.vim'
 
 
 " ctrlpvim/ctrlp.vim {{{2
@@ -414,15 +383,16 @@ Plug 'tpope/vim-projectionist'
 
 " tpope/vim-fugitive {{{2
 Plug 'tpope/vim-fugitive'
-nnoremap gs :Gstatus<CR>
-nnoremap gw :Gwrite<CR>
-nnoremap go :Gcommit<CR>
-" nnoremap gD :Gdiff<CR><C-w>L
-nnoremap gD :Gdiff<CR>
-nnoremap gb :Gblame<CR>
-nnoremap g<C-b> :echo fugitive#statusline()<CR>
+nnoremap <silent> gs :Git<CR>
+nnoremap <silent> gw :Gwrite<CR>
+nnoremap <silent> go :Git commit<CR>
+nnoremap <silent> gD :Gvdiffsplit<CR>
+nnoremap <silent> gb :Git blame<CR>
+nnoremap <silent> g<C-b> :echo fugitive#statusline()<CR>
 autocmd BufReadPost fugitive://* set bufhidden=delete
 autocmd FileType gitcommit setlocal cursorline
+autocmd FileType fugitive nnoremap <silent> <buffer> q :q<CR>
+autocmd FileType fugitiveblame nnoremap <silent> <buffer> q :q<CR>
 
 
 " tpope/vim-surround {{{2
@@ -441,7 +411,7 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sensible'
 
 
-" " SirVer/ultisnips {{{2
+" SirVer/ultisnips {{{2
 Plug 'SirVer/ultisnips'
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
@@ -454,9 +424,8 @@ nnoremap <LocalLeader>s :split ~/.vim/ultisnippets<CR>
 " ervandew/supertab {{{2
 Plug 'ervandew/supertab'
 let g:SuperTabDefaultCompletionType = "<C-N>"
-let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
-let g:SuperTabContextDiscoverDiscovery =
-    \ ["&omnifunc:<c-x><c-n>", "&completefunc:<c-x><c-u>",]
+" let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
+"     \ ["&omnifunc:<c-x><c-n>", "&completefunc:<c-x><c-u>",]
 let g:SuperTabDefaultCompletionType = "context"
 
 
@@ -529,16 +498,6 @@ let g:lightline.component = {
     \ 'spell': '%{&spell?&spelllang:""}',
     \ 'lineinfo': '%3l:%-2v' }
 
-" augroup AutoSyntastic
-"     autocmd!
-"     autocmd BufWritePost *.clj,*.py call s:syntastic()
-" augroup END
-
-" function! s:syntastic()
-"     SyntasticCheck
-"     call lightline#update()
-" endfunction
-
 let g:lightline.tab = {
             \ 'active': [ 'tabnum', 'filename', 'modified' ],
             \ 'inactive': [ 'tabnum', 'filename', 'modified' ] }
@@ -553,7 +512,7 @@ function! s:lightline_update()
         return
     endif
     try
-        if g:colors_name =~# 'gruvbox\|hybrid\|molokai\|dracula\|wombat\|solarized\|jellybeans\|Tomorrow\|gotham\|synthwave\|nord'
+        if g:colors_name =~# 'gruvbox\|hybrid\|molokai\|dracula\|wombat\|solarized\|jellybeans\|Tomorrow\|synthwave\|nord\|miramare\|tokyonight\|mountaineer'
             let g:lightline.colorscheme =
                         \ substitute(substitute(g:colors_name, '-', '_', 'g'), '256.*', '', '') .
                         \ (g:colors_name ==# 'solarized' ? '_' . &background : '')
@@ -601,24 +560,10 @@ let g:rooter_change_directory_for_non_project_files = 'current'
 let g:rooter_silent_chdir = 1
 
 
-" mhinz/vim-signify {{{2
-Plug 'mhinz/vim-signify'
-nnoremap gh :SignifyToggleHighlight<CR>
-
-
 " junegunn/gv.vim {{{2
 Plug 'junegunn/gv.vim', {'on': 'GV'}
 nnoremap gl :GV<CR>
 nnoremap gL :GV!<CR>
-
-
-" junegunn/vim-peekaboo {{{2
-Plug 'junegunn/vim-peekaboo'
-
-
-" scrooloose/nerdtree {{{2
-Plug 'scrooloose/nerdtree', {'on': 'NERDTreeCWD'}
-let NERDTreeHijackNetrw = 0
 
 
 " plytophogy/vim-virtualenv {{{2
@@ -627,11 +572,11 @@ Plug 'plytophogy/vim-virtualenv', {'for': 'python'}
 
 
 " tweekmonster/braceless.vim {{{2
-Plug 'tweekmonster/braceless.vim'
+Plug 'tweekmonster/braceless.vim', {'for': 'python'}
 " autocmd FileType python BracelessEnable +fold
 autocmd FileType python BracelessEnable +indent
-let g:braceless_jump_prev_key = '['
-let g:braceless_jump_next_key = ']'
+" let g:braceless_jump_prev_key = '['
+" let g:braceless_jump_next_key = ']'
 
 
 " mhinz/vim-grepper {{{2
@@ -643,13 +588,16 @@ xmap gr <plug>(GrepperOperator)
 nnoremap <leader>* :Grepper -tool rg -cword -noprompt<cr>
 nnoremap g: :GrepperRg<SPACE>
 " let g:grepper.prompt = 0
-" let g:grepper.side = 1
+" let g:grepper.side = 0
 let g:grepper.highlight = 1
 
+command! Todo Grepper -noprompt -tool rg -query '(TODO|FIXME|XXX|NOTE)'
+command! TodoBuffer Grepper-buffer -noprompt -tool rg -query '(TODO|FIXME|XXX|NOTE)'
+nnoremap <silent> <LocalLeader>t :TodoBuffer<CR>
+nnoremap <silent> <LocalLeader>T :Todo<CR>
 
 " nvie/vim-flake8 {{{2
 Plug 'nvie/vim-flake8', {'for': 'python'}
-" autocmd BufWritePost **/*.py call Flake8()
 
 
 " psf/black {{{2
@@ -669,87 +617,122 @@ let g:ale_linters = {'python': ['black', 'flake8']}
 
 " davidhalter/jedi-vim {{{2
 Plug 'davidhalter/jedi-vim', {'for': 'python'}
-" let g:jedi#auto_initialization = 1
+" let g:jedi#completions_command = "<C-N>"
+let g:jedi#auto_initialization = 1
 let g:jedi#popup_on_dot = 0
 " let g:jedi#show_call_signatures = 1
 
 " Vimjas/vim-python-pep8-indent {{{2
 Plug 'Vimjas/vim-python-pep8-indent', {'for': 'python'}
 
-" chrisbra/csv.vim {{{2
-Plug 'chrisbra/csv.vim', {'for': 'csv'}
+
+" AaronLasseigne/yank-code {{{2
+Plug 'AaronLasseigne/yank-code', {'on': 'YankCode'}
 
 
-" ivalkeen/vim-simpledb {{{2
-Plug 'ivalkeen/vim-simpledb'
+" " Konfekt/FastFold {{{2
+" Plug 'Konfekt/FastFold'
+" nmap zuz <Plug>(FastFoldUpdate)
+" let g:fastfold_savehook = 1
+" let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
+" let g:fastfold_fold_movement_commands = [']z', '[z', 'zj', 'zk']
+
+
+" Olical/conjure {{{2
+Plug 'Olical/conjure', {'tag': 'v4.20.0'}
+
+" Olical/aniseed {{{2
+Plug 'Olical/aniseed', { 'tag': 'v3.16.0' }
+
+" luochen1990/rainbow {{{2
+Plug 'luochen1990/rainbow', {'do': 'RainbowToggleOn'}
+let g:rainbow_active = 0
+
+
+" fatih/vim-go {{{2
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+
+" pechorin/any-jump.vim {{{2
+Plug 'pechorin/any-jump.vim'
+
+" Or override all default colors
+let g:any_jump_colors = {
+      \"plain_text":         "Comment",
+      \"preview":            "Comment",
+      \"preview_keyword":    "Operator",
+      \"heading_text":       "Function",
+      \"heading_keyword":    "Identifier",
+      \"group_text":         "Comment",
+      \"group_name":         "Function",
+      \"more_button":        "Operator",
+      \"more_explain":       "Comment",
+      \"result_line_number": "Comment",
+      \"result_text":        "Statement",
+      \"result_path":        "String",
+      \"help":               "Comment"
+      \}
+
+" guns/vim-sexp {{{2
+Plug 'guns/vim-sexp', {'for': 'clojure'}
+autocmd FileType clojure nnoremap <buffer> <M-b> :CtrlPBuffer<CR>
+
+
+" voldikss/vim-floaterm {{{2
+Plug 'voldikss/vim-floaterm'
+hi FloatermBorder guibg=normal guifg=foreground
+let g:floaterm_wintype='vsplit'
+let g:floaterm_width=0.4
+let g:floaterm_autohide=2
+nnoremap <M-e> :FloatermToggle<CR>
+tnoremap <M-e> <C-\><C-n>:FloatermToggle<CR>
+tnoremap <M-k> <C-\><C-n>:FloatermKill<CR>
+tnoremap <M-h> <C-\><C-n>:FloatermHide<CR>
+nnoremap <Leader>f :FloatermNew nnn<CR>
+
+
+" junegunn/fzf.vim
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 
 
 " tpope/vim-dadbod {{{2
 Plug 'tpope/vim-dadbod'
-" :DB postgresql://pricing_ro@db2-vrack.abc-culture.fr:6423/pricing < %
 
 
 " tpope/vim-dispatch {{{2
 Plug 'tpope/vim-dispatch'
 
 
-" tpope/obsession {{{2
-Plug 'tpope/vim-obsession'
-
-" vim-scripts/dbext.vim {{{2
-Plug 'vim-scripts/dbext.vim'
+" neovim/nvim-lspconfig {{{2
+Plug 'neovim/nvim-lspconfig'
 
 
-" terryma/vim-multiple-cursors {{{2
-" Plug 'terryma/vim-multiple-cursors'
+" nvim-treesitter/nvim-treesitter {{{2
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 
-" AaronLasseigne/yank-code {{{2
-Plug 'AaronLasseigne/yank-code', {'on': 'YankCode'}
+" nvim-treesitter/nvim-treesitter-textobjects {{{2
+Plug 'nvim-treesitter/nvim-treesitter-textobjects'
 
+" nvim-treesitter/nvim-treesitter-refactor
+Plug 'nvim-treesitter/nvim-treesitter-refactor'
 
-" " easymotion/vim-easymotion {{{2
-" Plug 'easymotion/vim-easymotion'
-" nmap M <Plug>(easymotion-overwin-f2)
-" map  <Leader>w <Plug>(easymotion-bd-w)
-" nmap <Leader>w <Plug>(easymotion-overwin-w)
-" map  ? <Plug>(easymotion-sn)
-" omap ? <Plug>(easymotion-tn)
+" lewis6991/gitsigns.nvim {{{2
+Plug 'nvim-lua/plenary.nvim'
+Plug 'lewis6991/gitsigns.nvim'
 
-
-" kalekundert/vim-coiled-snake {{{2
-Plug 'kalekundert/vim-coiled-snake', {'for': 'python'}
-
-" Konfekt/FastFold {{{2
-Plug 'Konfekt/FastFold'
-nmap zuz <Plug>(FastFoldUpdate)
-let g:fastfold_savehook = 1
-let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
-let g:fastfold_fold_movement_commands = [']z', '[z', 'zj', 'zk']
-
-
-" cespare/vim-toml {{{2
-Plug 'cespare/vim-toml', {'for': 'toml'}
-
-
-" chrisbra/NrrwRgn {{{2
-Plug 'chrisbra/NrrwRgn'
-
-
-" alfredodeza/pytest.vim {{{2
-Plug 'alfredodeza/pytest.vim'
-
-
-" Olical/conjure {{{2
-Plug 'Olical/conjure', {'tag': 'v4.9.0'}
-
-
+" End of plugins {{{1
 call plug#end()
 
+" Colorscheme {{{2
 if has('gui_running') || exists('g:GuiLoaded')
-    colorscheme hybrid
+    colorscheme nord
 else
-    colorscheme default
+    colorscheme nord
+endif
+
+if (has("termguicolors"))
+  set termguicolors
 endif
 
 
