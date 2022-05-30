@@ -66,6 +66,7 @@ augroup vimrc_group
     autocmd FileType tex inoremap <buffer> é \'e
     autocmd FileType tex inoremap <buffer> è \`e
     autocmd FileType tex inoremap <buffer> à \`a
+    " autocmd FileType tex setlocal conceallevel=1
 
     " GO
     autocmd FileType go setlocal softtabstop=4 tabstop=4 shiftwidth=4 textwidth=79
@@ -92,10 +93,6 @@ inoremap kj <ESC>
 nnoremap <C-SPACE> :w<CR>
 tnoremap <Esc> <C-\><C-n>
 
-" For some reason <C-^> doesn
-nnoremap ² :e #<CR>
-nnoremap œ :e #<CR>
-
 " Paste (by sheerun)
 vnoremap <silent> y y`]
 
@@ -113,6 +110,8 @@ nnoremap <Leader>s :so %<CR>
 " Edit files
 nnoremap <Leader>v :e ~/.vim/vimrc<CR>
 nnoremap <Leader>V :sp ~/.vim/vimrc<CR>
+nnoremap <Leader>i :e ~/.config/nvim/init.vim<CR>
+nnoremap <Leader>I :sp ~/.config/nvim/init.vim<CR>
 
 " Search
 nnoremap <Leader>* /\<\><Left><Left>
@@ -154,7 +153,7 @@ cnoremap <C-A> <HOME>
 cnoremap <C-E> <END>
 
 " Navigation {{{2
-nnoremap <Leader>e :Explore<CR>
+" nnoremap <Leader>e :Explore<CR>
 
 " Jump to definition and open it in vertical split
 nnoremap <silent> <Leader>T :let word=expand("<cword>")<CR>:vertical topleft split<CR>:wincmd w<cr>:exec("tag ". word)<CR>
@@ -171,7 +170,8 @@ nnoremap S :normal n.<CR>
 nnoremap <SPACE> za
 nnoremap g1 A<SPACE>{{{1<ESC>
 nnoremap g2 A<SPACE>{{{2<ESC>
-nnoremap g3 A<SPACE>{{{3<ESC
+nnoremap g3 A<SPACE>{{{3<ESC>
+nnoremap g4 A<SPACE>{{{4<ESC>
 
 " Windows {{{2
 " Jump to a window
@@ -179,7 +179,6 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
-" nnoremap <TAB> <C-w>w
 
 " Close a window
 nnoremap <C-c>h <C-w>h:q<CR>
@@ -224,12 +223,12 @@ set number
 set clipboard=unnamed
 set maxmempattern=100000
 
-" Adapt the background to the current time
-if strftime("%H") > 8 && strftime("%H") < 17
-    set background=light
-else
-    set background=dark
-endif
+" " Adapt the background to the current time
+" if strftime("%H") > 8 && strftime("%H") < 17
+"     set background=light
+" else
+"     set background=dark
+" endif
 
 " Folds
 set nofoldenable
@@ -272,8 +271,9 @@ elseif exists('g:GuiLoaded')
     GuiFont! JetBrains Mono:h14:w50
     GuiLinespace 3
 elseif exists('g:gonvim_running')
-    set linespace=5
-    set guifont=Iosevka:h15:l
+    set linespace=3
+    " set guifont=Iosevka:h15:l
+    set guifont=JetBrainsMono:h14:l
 else
     set t_Co=256
 endif
@@ -315,12 +315,21 @@ call plug#begin('~/.vim/bundle')
 let $PLUG_SRC = exists('$DBOX/Projects') ? $DBOX . '/Projects' : 'TaurusOlson'
 
 " colors {{{2
+Plug 'catppuccin/nvim'
+Plug 'arzg/vim-substrata'
+Plug 'b4skyx/serenade'
+let g:serenade_enable_italic = 0
+let g:serenade_disable_italic_comment = 1
+let g:serenade_cursor = 'purple'
+
 Plug 'co1ncidence/mountaineer.vim'
 Plug 'co1ncidence/javacafe.vim'
-Plug 'ghifarit53/tokyonight-vim'
+" Plug 'ghifarit53/tokyonight-vim'
+" let g:tokyonight_menu_selection_background = 'red'
+Plug 'folke/tokyonight.nvim'
 let g:tokyonight_style = 'storm' " available: night, storm
-let g:tokyonight_enable_italic = 0
-let g:tokyonight_menu_selection_background = 'red'
+let g:tokyonight_italic_functions = 1    
+let g:tokyonight_sidebars = [ "qf", "terminal" ] 
 
 Plug '$PLUG_SRC/darkburn.vim'
 Plug '$PLUG_SRC/hornet.vim'
@@ -329,7 +338,7 @@ Plug '$PLUG_SRC/creature.vim'
 Plug 'morhetz/gruvbox'
 Plug 'w0ng/vim-hybrid'
 Plug 'dracula/vim'
-Plug 'chriskempson/vim-tomorrow-theme'
+" Plug 'chriskempson/vim-tomorrow-theme'
 Plug 'kristijanhusak/vim-hybrid-material'
 let g:enable_bold_font = 0
 Plug 'rakr/vim-two-firewatch'
@@ -339,7 +348,6 @@ let g:nord_underline = 1
 let g:nord_italic_comments = 0
 let g:nord_uniform_status_lines = 1
 Plug 'franbach/miramare'
-Plug 'AhmedAbdulrahman/aylin.vim'
 
 
 " ctrlpvim/ctrlp.vim {{{2
@@ -362,14 +370,13 @@ if has('gui_running')
     execute "set <M-g>=\eg"
     execute "set <M-u>=\eu"
     execute "set <M-r>=\er"
-    " execute "set <M-t>=\et"
-    " execute "set <M-t>=\es"
+    execute "set <M-t>=\et"
+    execute "set <M-t>=\es"
 endif
 
 nnoremap <M-b> :CtrlPBuffer<CR>
 nnoremap <M-g> :CtrlPTag<CR>
 nnoremap <M-t> :CtrlPBufTag<CR>
-" nnoremap <M-t> :CtrlPTag<CR>
 nnoremap <M-u> :CtrlPMRU<CR>
 nnoremap <M-r> :CtrlPRoot<CR>
 nnoremap <LocalLeader>a :CtrlPBookmarkDirAdd .<CR>
@@ -420,14 +427,12 @@ let g:UltiSnipsSnippetsDir='~/.vim/ultisnippets'
 let g:UltiSnipsSnippetDirectories=['ultisnippets']
 nnoremap <LocalLeader>s :split ~/.vim/ultisnippets<CR>
 
-
 " ervandew/supertab {{{2
 Plug 'ervandew/supertab'
 let g:SuperTabDefaultCompletionType = "<C-N>"
 " let g:SuperTabContextTextOmniPrecedence = ['&omnifunc', '&completefunc']
 "     \ ["&omnifunc:<c-x><c-n>", "&completefunc:<c-x><c-u>",]
 let g:SuperTabDefaultCompletionType = "context"
-
 
 " majutsushi/tagbar {{{2
 Plug 'majutsushi/tagbar'
@@ -442,15 +447,13 @@ let g:tagbar_iconchars = ['▸','▾']
 Plug 'plasticboy/vim-markdown', {'for': 'markdown'}
 let g:vim_markdown_folding_disabled=0
 let g:vim_markdown_initial_foldlevel=0
+let g:vim_markdown_toc_autofit = 1
+let g:vim_markdown_folding_style_pythonic = 1
 autocmd BufEnter *.html.pmd setlocal ft=markdown
 
 
 " wellle/targets.vim {{{2
 Plug 'wellle/targets.vim'
-
-
-" mattn/emmet-vim {{{2
-Plug 'mattn/emmet-vim', {'for': ['html', 'htmldjango']}
 
 
 " jeffkreeftmeijer/vim-numbertoggle {{{2
@@ -512,7 +515,7 @@ function! s:lightline_update()
         return
     endif
     try
-        if g:colors_name =~# 'gruvbox\|hybrid\|molokai\|dracula\|wombat\|solarized\|jellybeans\|Tomorrow\|synthwave\|nord\|miramare\|tokyonight\|mountaineer'
+        if g:colors_name =~# 'gruvbox\|hybrid\|molokai\|dracula\|wombat\|solarized\|jellybeans\|Tomorrow\|synthwave\|nord\|miramare\|tokyonight\|mountaineer\|everforest\|serenade\|catppuccin'
             let g:lightline.colorscheme =
                         \ substitute(substitute(g:colors_name, '-', '_', 'g'), '256.*', '', '') .
                         \ (g:colors_name ==# 'solarized' ? '_' . &background : '')
@@ -569,10 +572,11 @@ nnoremap gL :GV!<CR>
 " plytophogy/vim-virtualenv {{{2
 let g:virtualenv_stl_format = '[%n]'
 Plug 'plytophogy/vim-virtualenv', {'for': 'python'}
+let g:virtualenv_directory = '$VIRTUAL_ENV'
 
 
 " tweekmonster/braceless.vim {{{2
-Plug 'tweekmonster/braceless.vim', {'for': 'python'}
+Plug 'tweekmonster/braceless.vim'
 " autocmd FileType python BracelessEnable +fold
 autocmd FileType python BracelessEnable +indent
 " let g:braceless_jump_prev_key = '['
@@ -589,12 +593,17 @@ nnoremap <leader>* :Grepper -tool rg -cword -noprompt<cr>
 nnoremap g: :GrepperRg<SPACE>
 " let g:grepper.prompt = 0
 " let g:grepper.side = 0
-let g:grepper.highlight = 1
+" let g:grepper.highlight = 1
 
-command! Todo Grepper -noprompt -tool rg -query '(TODO|FIXME|XXX|NOTE)'
-command! TodoBuffer Grepper-buffer -noprompt -tool rg -query '(TODO|FIXME|XXX|NOTE)'
-nnoremap <silent> <LocalLeader>t :TodoBuffer<CR>
-nnoremap <silent> <LocalLeader>T :Todo<CR>
+command! SearchTodos Grepper -noprompt -tool rg -query 'TODO'
+command! SearchTodosBuffer Grepper-buffer -noprompt -tool rg -query 'TODO'
+nnoremap <silent> <LocalLeader>t :SearchTodosBuffer<CR>
+nnoremap <silent> <LocalLeader>T :SearchTodos<CR>
+
+command! SearchNotes Grepper -noprompt -tool rg -query 'NOTE'
+command! SearchNotesBuffer Grepper-buffer -noprompt -tool rg -query 'NOTE'
+nnoremap <silent> <LocalLeader>n :SearchNotesBuffer<CR>
+nnoremap <silent> <LocalLeader>N :SearchNotes<CR>
 
 " nvie/vim-flake8 {{{2
 Plug 'nvie/vim-flake8', {'for': 'python'}
@@ -620,7 +629,7 @@ Plug 'davidhalter/jedi-vim', {'for': 'python'}
 " let g:jedi#completions_command = "<C-N>"
 let g:jedi#auto_initialization = 1
 let g:jedi#popup_on_dot = 0
-" let g:jedi#show_call_signatures = 1
+let g:jedi#show_call_signatures = 1
 
 " Vimjas/vim-python-pep8-indent {{{2
 Plug 'Vimjas/vim-python-pep8-indent', {'for': 'python'}
@@ -630,103 +639,150 @@ Plug 'Vimjas/vim-python-pep8-indent', {'for': 'python'}
 Plug 'AaronLasseigne/yank-code', {'on': 'YankCode'}
 
 
-" " Konfekt/FastFold {{{2
-" Plug 'Konfekt/FastFold'
-" nmap zuz <Plug>(FastFoldUpdate)
-" let g:fastfold_savehook = 1
-" let g:fastfold_fold_command_suffixes =  ['x','X','a','A','o','O','c','C']
-" let g:fastfold_fold_movement_commands = [']z', '[z', 'zj', 'zk']
-
-
 " Olical/conjure {{{2
-Plug 'Olical/conjure', {'tag': 'v4.20.0'}
+Plug 'Olical/conjure'
 
 " Olical/aniseed {{{2
-Plug 'Olical/aniseed', { 'tag': 'v3.16.0' }
+" Plug 'Olical/aniseed', { 'tag': 'v3.23.0' }
+" Tell aniseed to look up into ~/.config/nvim/fnl directory.
+" when Neovim in launched
+" let g:aniseed#env = v:true
+Plug 'Olical/fennel.vim', {'for': 'fennel'}
 
 " luochen1990/rainbow {{{2
-Plug 'luochen1990/rainbow', {'do': 'RainbowToggleOn'}
+Plug 'luochen1990/rainbow', {'for': 'clojure'}
 let g:rainbow_active = 0
 
 
-" fatih/vim-go {{{2
-Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
-
-" pechorin/any-jump.vim {{{2
-Plug 'pechorin/any-jump.vim'
-
-" Or override all default colors
-let g:any_jump_colors = {
-      \"plain_text":         "Comment",
-      \"preview":            "Comment",
-      \"preview_keyword":    "Operator",
-      \"heading_text":       "Function",
-      \"heading_keyword":    "Identifier",
-      \"group_text":         "Comment",
-      \"group_name":         "Function",
-      \"more_button":        "Operator",
-      \"more_explain":       "Comment",
-      \"result_line_number": "Comment",
-      \"result_text":        "Statement",
-      \"result_path":        "String",
-      \"help":               "Comment"
-      \}
-
 " guns/vim-sexp {{{2
 Plug 'guns/vim-sexp', {'for': 'clojure'}
-autocmd FileType clojure nnoremap <buffer> <M-b> :CtrlPBuffer<CR>
+autocmd FileType clojure nnoremap <M-b> :CtrlPBuffer<CR>
 
 
 " voldikss/vim-floaterm {{{2
 Plug 'voldikss/vim-floaterm'
 hi FloatermBorder guibg=normal guifg=foreground
 let g:floaterm_wintype='vsplit'
-let g:floaterm_width=0.4
+let g:floaterm_width=0.5
 let g:floaterm_autohide=2
 nnoremap <M-e> :FloatermToggle<CR>
 tnoremap <M-e> <C-\><C-n>:FloatermToggle<CR>
 tnoremap <M-k> <C-\><C-n>:FloatermKill<CR>
 tnoremap <M-h> <C-\><C-n>:FloatermHide<CR>
 nnoremap <Leader>f :FloatermNew nnn<CR>
+nnoremap <Leader>F :FloatermSend<SPACE>
+
+" cespare/vim-toml {{{2
+Plug 'cespare/vim-toml', {'for': 'toml'}
 
 
-" junegunn/fzf.vim
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
+" gelguy/wilder.nvim {{{2
+Plug 'gelguy/wilder.nvim', { 'do': ':UpdateRemotePlugins' }
 
 
-" tpope/vim-dadbod {{{2
-Plug 'tpope/vim-dadbod'
+" shoumodip/fm.vim {{{2
+" Plug 'shoumodip/fm.vim'
+" autocmd FileType fm nnoremap <buffer> <nowait> <silent> ? :call fm#help()<cr>
 
+" lambdalisue/fern.vim {{{2
+Plug 'lambdalisue/fern.vim'
+let g:fern#default_hidden = 1
+nnoremap <Leader>e :Fern %:h<CR>
+nnoremap <Leader>E :Fern -drawer %:h<CR>
+nnoremap <Leader>B :Fern bookmark:///<CR>
+autocmd FileType fern nnoremap <buffer> <silent> q :q<CR>
 
-" tpope/vim-dispatch {{{2
-Plug 'tpope/vim-dispatch'
+" lambdalisue/fern-hijack.vim {{{2
+Plug 'lambdalisue/fern-hijack.vim'
 
-
-" neovim/nvim-lspconfig {{{2
-Plug 'neovim/nvim-lspconfig'
-
+" " mcchrish/nnn.vim {{{2
+" Plug 'mcchrish/nnn.vim'
+" let g:nnn#set_default_mappings = 0
+" nnoremap <Leader>E :NnnPicker<CR>
+" nnoremap <Leader>e :NnnExplorer<CR>
+" let g:nnn#action = {
+"       \ '<c-t>': 'tab split',
+"       \ '<c-s>': 'split',
+"       \ '<c-v>': 'vsplit' }
 
 " nvim-treesitter/nvim-treesitter {{{2
+" We recommend updating the parsers on update
 Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 
-" nvim-treesitter/nvim-treesitter-textobjects {{{2
-Plug 'nvim-treesitter/nvim-treesitter-textobjects'
+" " nvim-telescope/telescope.nvim {{{2
+" Plug 'nvim-lua/plenary.nvim'
+" Plug 'nvim-telescope/telescope.nvim'
+" nnoremap <M-r> :lua require('telescope.builtin').find_files()<CR>
+" nnoremap <M-b> :lua require('telescope.builtin').buffers()<CR>
+" nnoremap <M-t> :lua require('telescope.builtin').current_buffer_tags()<CR>
+" nnoremap <M-u> :lua require('telescope.builtin').oldfiles()<CR>
 
-" nvim-treesitter/nvim-treesitter-refactor
-Plug 'nvim-treesitter/nvim-treesitter-refactor'
 
-" lewis6991/gitsigns.nvim {{{2
-Plug 'nvim-lua/plenary.nvim'
-Plug 'lewis6991/gitsigns.nvim'
+" chrisbra/csv.vim {{{2
+Plug 'chrisbra/csv.vim', {'for': 'csv'}
+
+" " phongnh/ctrlp-fzy-matcher {{{2
+" Plug 'phongnh/ctrlp-fzy-matcher'
+" let g:ctrlp_match_func = { 'match': 'fzy_matcher#match' }
+
+" lervag/vimtex {{{2
+Plug 'lervag/vimtex'
+let g:vimtex_view_method = 'zathura'
+let g:vimtex_quickfix_mode=0
+let g:tex_conceal='abdmg'
+
+
+" fatih/vim-go {{{2
+Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
+
+" " zefei/vim-wintabs {{{2
+" Plug 'zefei/vim-wintabs'
+" map <M-l> <Plug>(wintabs_next)
+" map <M-h> <Plug>(wintabs_previous)
+
+" tiagovla/scope.nvim {{{2
+Plug 'tiagovla/scope.nvim'
+
+
+" dccsillag/magma-nvim {{{2
+Plug 'dccsillag/magma-nvim', { 'do': ':UpdateRemotePlugins', 'for': 'python'}
+nnoremap <silent><expr> <LocalLeader>r  :MagmaEvaluateOperator<CR>
+nnoremap <silent>       <LocalLeader>rr :MagmaEvaluateLine<CR>
+xnoremap <silent>       <LocalLeader>r  :<C-u>MagmaEvaluateVisual<CR>
+nnoremap <silent>       <LocalLeader>rc :MagmaReevaluateCell<CR>
+nnoremap <silent>       <LocalLeader>rd :MagmaDelete<CR>
+nnoremap <silent>       <LocalLeader>ro :MagmaShowOutput<CR>
+let g:magma_automatically_open_output = v:false
+
+
+" Manas140/run.nvim {{{2
+Plug 'Manas140/run.nvim'
+
+" elixir-editors/vim-elixir {{{2
+Plug 'elixir-editors/vim-elixir'
+
 
 " End of plugins {{{1
 call plug#end()
 
+" scope config {{{2
+lua <<EOF
+require("scope").setup()
+EOF
+
+" wilder config {{{2
+call wilder#setup({'modes': ['/', '?']})
+call wilder#set_option('renderer', wilder#wildmenu_renderer(
+      \ wilder#wildmenu_lightline_theme({
+      \   'highlights': {},
+      \   'highlighter': wilder#basic_highlighter(),
+      \   'separator': ' · ',
+      \ })))
+
 " Colorscheme {{{2
 if has('gui_running') || exists('g:GuiLoaded')
-    colorscheme nord
+    colorscheme tokyonight
 else
     colorscheme nord
 endif

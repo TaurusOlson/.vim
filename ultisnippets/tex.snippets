@@ -21,10 +21,21 @@ snippet "b(egin)?" "begin{} / end{}" br
 \end{$1}
 endsnippet
 
-snippet tab
+snippet tabular
 \begin{${1:t}${1/(t)$|(a)$|(.*)/(?1:abular)(?2:rray)/}}{${2:c}}
 $0${2/((?<=.)c|l|r)|./(?1: & )/g}
 \end{$1${1/(t)$|(a)$|(.*)/(?1:abular)(?2:rray)/}}
+endsnippet
+
+snippet tab "Table environment" b
+\begin{table}[${1:htpb}]
+	\centering
+	\begin{tabular}{${5:c}}
+	$0${5/((?<=.)c|l|r)|./(?1: & )/g}
+	\end{tabular}
+	\caption{${2:caption}}
+	\label{tab:${3:label}}
+\end{table}
 endsnippet
 
 snippet fig "Figure environment" b
@@ -67,28 +78,28 @@ ${0}
 endsnippet
 
 snippet cha "Chapter" b
-\chapter{${1:chapter name}}
+\chapter{${1:chapter name}} % {{{1
 \label{cha:${2:${1/\\\w+\{(.*?)\}|\\(.)|(\w+)|([^\w\\]+)/(?4:_:\L$1$2$3\E)/ga}}}
 
 ${0}
 endsnippet
 
 snippet sec "Section" b
-\section{${1:section name}}
+\section{${1:section name}} % {{{2
 \label{sec:${2:${1/\\\w+\{(.*?)\}|\\(.)|(\w+)|([^\w\\]+)/(?4:_:\L$1$2$3\E)/ga}}}
 
 ${0}
 endsnippet
 
 snippet sub "Subsection" b
-\subsection{${1:subsection name}}
+\subsection{${1:subsection name}} % {{{3
 \label{sub:${2:${1/\\\w+\{(.*?)\}|\\(.)|(\w+)|([^\w\\]+)/(?4:_:\L$1$2$3\E)/ga}}}
 
 ${0}
 endsnippet
 
 snippet ssub "Subsubsection" b
-\subsubsection{${1:subsubsection name}}
+\subsubsection{${1:subsubsection name}} % {{{4
 \label{ssub:${2:${1/\\\w+\{(.*?)\}|\\(.)|(\w+)|([^\w\\]+)/(?4:_:\L$1$2$3\E)/ga}}}
 
 ${0}
